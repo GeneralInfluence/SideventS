@@ -1,2 +1,2 @@
-packages:
-  - 'examples/*'
+overrides:
+  autoconnect: link:../../../../../../Library/pnpm/global/5/node_modules/@unicorn.eth/autoconnect

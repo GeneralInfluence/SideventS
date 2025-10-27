@@ -1,63 +1,26 @@
 {
-  "name": "@unicorn.eth/autoconnect",
-  "version": "1.2.1",
-  "description": "Drop-in Unicorn wallet integration for existing web3 apps. Works alongside your existing wallet setup (RainbowKit, Wagmi, etc.) without modifying any code.",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist",
-    "src",
-    "README.md",
-    "LICENSE"
-  ],
+  "name": "unicorn-autoconnect-basic-example",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Basic integration example for @unicorn.eth/autoconnect",
+  "type": "module",
   "scripts": {
-    "build": "tsup src/index.js --format cjs,esm --external react,react-dom,wagmi,thirdweb && cp src/types/index.d.ts dist/index.d.ts",
-    "dev": "tsup src/index.js --format esm --watch",
-    "prepublishOnly": "pnpm run build"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "keywords": [
-    "unicorn",
-    "wallet",
-    "web3",
-    "ethereum",
-    "wagmi",
-    "rainbowkit",
-    "thirdweb",
-    "autoconnect",
-    "gasless",
-    "smart-account",
-    "web3 account"
-  ],
-  "author": "Unicorn.eth",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/unicorn-eth/autoconnect.git"
-  },
-  "bugs": {
-    "url": "https://github.com/unicorn-eth/autoconnect/issues"
-  },
-  "homepage": "https://github.com/unicorn-eth/autoconnect#readme",
-  "peerDependencies": {
+  "dependencies": {
+    "@rainbow-me/rainbowkit": "^2.2.8",
+    "@tanstack/react-query": "^5.90.5",
+  "@unicorn.eth/autoconnect": "^1.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "thirdweb": "^5.68.0",
-    "wagmi": "^2.17.0"
+    "viem": "^2.0.0",
+    "wagmi": "^2.0.0"
   },
   "devDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "^4.52.5",
-    "rollup": "^4.52.5",
-    "tsup": "^8.0.0"
-  },
-  "publishConfig": {
-    "access": "public"
+    "@vitejs/plugin-react": "^4.3.0",
+    "vite": "^7.1.6"
   }
 }
