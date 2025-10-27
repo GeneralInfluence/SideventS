@@ -9,8 +9,8 @@ import { RainbowKitProvider, ConnectButton } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
 
 // Import from source code
-import { unicornConnector } from '../../../connectors/unicornConnector.js';
-import UnicornAutoConnect from '../../../components/UnicornAutoConnect.jsx';
+import { unicornConnector } from './connectors/unicornConnector.js';
+import UnicornAutoConnect from './components/UnicornAutoConnect.jsx';
 
 // Import our components
 import { WalletStatus } from './components/WalletStatus.jsx';

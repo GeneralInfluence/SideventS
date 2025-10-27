@@ -1,7 +1,7 @@
 // src/examples/basic/src/components/WalletStatus.jsx
 // Wallet connection status display
 
-import { useUniversalWallet } from '../../../../hooks/useUniversalWallet.js';
+import { useUniversalWallet } from '../hooks/useUniversalWallet.js';
 
 export function WalletStatus() {
   const wallet = useUniversalWallet();
