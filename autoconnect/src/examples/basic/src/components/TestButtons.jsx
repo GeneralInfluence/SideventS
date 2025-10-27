@@ -5,13 +5,13 @@ import { useState } from 'react';
 import { parseEther } from 'viem';
 import {
   useUniversalWallet
-} from '../../../../hooks/useUniversalWallet.js';
+} from '../hooks/useUniversalWallet.js';
 import {
   useUniversalTransaction
-} from '../../../../hooks/useUniversalTransaction.js';
+} from '../hooks/useUniversalTransaction.js';
 import {
   useUniversalSignMessage
-} from '../../../../hooks/useUniversalSignMessage.js';
+} from '../hooks/useUniversalSignMessage.js';
 
 const USDC_BASE = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
 const TEST_ADDRESS = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
