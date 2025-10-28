@@ -1,0 +1,42 @@
+query GetEvent($id: MongoID!) {
+  getEvent(_id: $id) {
+    _id
+    title
+    description
+    state
+    start
+    end
+    location {
+      coordinates
+    }
+    host
+    tickets {
+      _id
+    }
+    calendar_links {
+      google
+      outlook
+    }
+  }
+}
+
+query ListEventGuests($eventId: MongoID!) {
+  listEventGuests(event: $eventId) {
+    items {
+      user {
+        _id
+        name
+        wallets_new
+      }
+      ticket {
+        _id
+      }
+    }
+  }
+}
+
+query PeekEventGuests($eventId: MongoID!) {
+  peekEventGuests(_id: $eventId) {
+    total
+  }
+}

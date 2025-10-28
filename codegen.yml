@@ -1,0 +1,20 @@
+schema: ${LEMONADE_GRAPHQL_ENDPOINT:https://backend.lemonade.social/}
+documents: src/graphql/**/*.graphql
+
+generates:
+  src/generated/lemonade-sdk.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-graphql-request
+    config:
+      avoidOptionals: true
+      maybeValue: T | null
+      enumsAsTypes: true
+      preResolveTypes: true
+      scalars:
+        MongoID: string
+        DateTimeISO: string
+        JSON: any
+
+# You can override the endpoint via LEMONADE_GRAPHQL_ENDPOINT if you ever need a staging URL.
