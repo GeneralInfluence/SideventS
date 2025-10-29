@@ -12,6 +12,7 @@ type WalletType = {
 
 function getPageForWallet(wallet: WalletType) {
   // Example: If wallet address starts with '0xethd', show PageETHD
+  console.log('Wallet address:', wallet?.address);
   if (wallet?.address?.toLowerCase().startsWith('0x338DE89f3BB60444BAc39D27dDd8324A2497Cb8f')) {
     return <PageETHD />;
   }
