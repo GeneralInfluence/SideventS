@@ -1,42 +1,34 @@
-query GetEvent($id: MongoID!) {
-  getEvent(_id: $id) {
+query GetEventByShortId($shortid: String!) {
+  getEvent(shortid: $shortid) {
     _id
-    title
-    description
-    state
+    address {
+      latitude
+      longitude
+    }
+    attending_count
+    cost
+    events
+    external_hostname
+    host
+    guest_limit
+    guests
+    slug
+    url
+    welcome_text
+  }
+}
+query GetUpcomingEventsForHost($user: MongoID!) {
+  getUpcomingEvents(user: $user, host: true) {
+    _id
+    name
+    status
     start
     end
-    location {
-      coordinates
-    }
-    host
-    tickets {
-      _id
-    }
-    calendar_links {
-      google
-      outlook
-    }
-  }
-}
-
-query ListEventGuests($eventId: MongoID!) {
-  listEventGuests(event: $eventId) {
-    items {
-      user {
-        _id
-        name
-        wallets_new
-      }
-      ticket {
-        _id
-      }
-    }
-  }
-}
-
-query PeekEventGuests($eventId: MongoID!) {
-  peekEventGuests(_id: $eventId) {
-    total
+    cost
+    guest_limit
+    guests
+    url
+    slug
+    welcome_text
   }
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import PageHost from './components/PageHost';
+import PageRoute from './components/PageRoute';
 import { useUniversalWallet } from './hooks/useUniversalWallet';
 // src/examples/basic/src/App.jsx
 // Clean example app for @unicorn.eth/autoconnect v1.2.0+
@@ -96,8 +96,9 @@ function TestApp() {
         {/* Wallet Status */}
         <WalletStatus />
 
-        {/* Wallet-based page logic: show PageHost if Unicorn wallet is connected */}
-        {isUnicornConnected && <PageHost />}
+  {/* Wallet-based page logic: show PageRoute if Unicorn wallet is connected */}
+  {/* {isUnicornConnected && <PageRoute />} */}
+  <PageRoute />
 
         {/* Test Buttons */}
         <TestButtons />

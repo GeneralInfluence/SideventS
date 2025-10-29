@@ -9377,71 +9377,56 @@ export type WhitelistUserInfo = {
   email: Scalars['String']['output'];
 };
 
-export type GetEventQueryVariables = Exact<{
-  id: Scalars['MongoID']['input'];
+export type GetEventByShortIdQueryVariables = Exact<{
+  shortid: Scalars['String']['input'];
 }>;
 
 
-export type GetEventQuery = { __typename?: 'Query', getEvent: { __typename?: 'Event', _id: string | null, title: string, description: string | null, state: EventState, start: string, end: string, host: string, location: { __typename?: 'Point', coordinates: Array<number> } | null, tickets: Array<{ __typename?: 'TicketBase', _id: string }> | null, calendar_links: { __typename?: 'EventCalendarLinks', google: string, outlook: string } | null } | null };
+export type GetEventByShortIdQuery = { __typename?: 'Query', getEvent: { __typename?: 'Event', _id: string | null, attending_count: number | null, cost: number | null, events: Array<string> | null, external_hostname: string | null, host: string, guest_limit: number | null, guests: number | null, slug: string, url: string | null, welcome_text: string | null, address: { __typename?: 'Address', latitude: number | null, longitude: number | null } | null } | null };
 
-export type ListEventGuestsQueryVariables = Exact<{
-  eventId: Scalars['MongoID']['input'];
+export type GetUpcomingEventsForHostQueryVariables = Exact<{
+  user: Scalars['MongoID']['input'];
 }>;
 
 
-export type ListEventGuestsQuery = { __typename?: 'Query', listEventGuests: { __typename?: 'ListEventGuestsResponse', items: Array<{ __typename?: 'EventGuestDetail', user: { __typename?: 'EventGuestUser', _id: string | null, name: string | null, wallets_new: any | null }, ticket: { __typename?: 'Ticket', _id: string } | null }> } };
-
-export type PeekEventGuestsQueryVariables = Exact<{
-  eventId: Scalars['MongoID']['input'];
-}>;
+export type GetUpcomingEventsForHostQuery = { __typename?: 'Query', getUpcomingEvents: Array<{ __typename?: 'Event', _id: string | null, title: string, state: EventState, start: string, end: string, cost: number | null, guest_limit: number | null, guests: number | null, url: string | null, slug: string, welcome_text: string | null }> };
 
 
-export type PeekEventGuestsQuery = { __typename?: 'Query', peekEventGuests: { __typename?: 'PeekEventGuestsResponse', total: number } };
-
-
-export const GetEventDocument = gql`
-    query GetEvent($id: MongoID!) {
-  getEvent(_id: $id) {
+export const GetEventByShortIdDocument = gql`
+    query GetEventByShortId($shortid: String!) {
+  getEvent(shortid: $shortid) {
+    _id
+    address {
+      latitude
+      longitude
+    }
+    attending_count
+    cost
+    events
+    external_hostname
+    host
+    guest_limit
+    guests
+    slug
+    url
+    welcome_text
+  }
+}
+    `;
+export const GetUpcomingEventsForHostDocument = gql`
+    query GetUpcomingEventsForHost($user: MongoID!) {
+  getUpcomingEvents(user: $user, host: true) {
     _id
     title
-    description
     state
     start
     end
-    location {
-      coordinates
-    }
-    host
-    tickets {
-      _id
-    }
-    calendar_links {
-      google
-      outlook
-    }
-  }
-}
-    `;
-export const ListEventGuestsDocument = gql`
-    query ListEventGuests($eventId: MongoID!) {
-  listEventGuests(event: $eventId) {
-    items {
-      user {
-        _id
-        name
-        wallets_new
-      }
-      ticket {
-        _id
-      }
-    }
-  }
-}
-    `;
-export const PeekEventGuestsDocument = gql`
-    query PeekEventGuests($eventId: MongoID!) {
-  peekEventGuests(_id: $eventId) {
-    total
+    cost
+    guest_limit
+    guests
+    url
+    slug
+    welcome_text
   }
 }
     `;
@@ -9453,14 +9438,11 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
-    GetEvent(variables: GetEventQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<GetEventQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetEventQuery>({ document: GetEventDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'GetEvent', 'query', variables);
+    GetEventByShortId(variables: GetEventByShortIdQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<GetEventByShortIdQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetEventByShortIdQuery>({ document: GetEventByShortIdDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'GetEventByShortId', 'query', variables);
     },
-    ListEventGuests(variables: ListEventGuestsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<ListEventGuestsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ListEventGuestsQuery>({ document: ListEventGuestsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'ListEventGuests', 'query', variables);
-    },
-    PeekEventGuests(variables: PeekEventGuestsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<PeekEventGuestsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<PeekEventGuestsQuery>({ document: PeekEventGuestsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'PeekEventGuests', 'query', variables);
+    GetUpcomingEventsForHost(variables: GetUpcomingEventsForHostQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<GetUpcomingEventsForHostQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetUpcomingEventsForHostQuery>({ document: GetUpcomingEventsForHostDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'GetUpcomingEventsForHost', 'query', variables);
     }
   };
 }
