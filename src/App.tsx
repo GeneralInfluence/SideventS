@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import PageHost from './components/PageHost';
 import { useUniversalWallet } from './hooks/useUniversalWallet';
 // src/examples/basic/src/App.jsx
@@ -42,7 +43,11 @@ const queryClient = new QueryClient();
 
 function TestApp() {
   const wallet = useUniversalWallet();
-  const isUnicornConnected = wallet?.isUnicorn && wallet?.unicornWallet;
+  const [isUnicornConnected, setIsUnicornConnected] = useState(false);
+
+  useEffect(() => {
+    setIsUnicornConnected(Boolean(wallet?.isUnicorn && wallet?.unicornWallet));
+  }, [wallet?.isUnicorn, wallet?.unicornWallet]);
 
   return (
     <>
@@ -128,8 +133,8 @@ function TestApp() {
         </div>
       </div>
 
-      {/* Wallet-based page logic: show PageHost if Unicorn wallet is connected */}
-      {isUnicornConnected && <PageHost />}
+  {/* Wallet-based page logic: show PageHost if Unicorn wallet is connected */}
+  {isUnicornConnected && <PageHost />}
     </>
   );
 }
