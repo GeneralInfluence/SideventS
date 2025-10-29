@@ -13,16 +13,16 @@ type WalletType = {
 function getPageForWallet(wallet: WalletType) {
   // Example: If wallet address starts with '0xethd', show PageETHD
   console.log('Wallet address:', wallet?.address);
-  if (wallet?.address?.toLowerCase().startsWith('0x338DE89f3BB60444BAc39D27dDd8324A2497Cb8f')) {
+  if (wallet?.address === '0x338DE89f3BB60444BAc39D27dDd8324A2497Cb8f') {
     return <PageETHD />;
   }
   // Add more conditions for other pages
-  // Example: If wallet address starts with '0xuser', show PageUser
-  if (wallet?.address?.toLowerCase().startsWith('0xuser')) {
+  // Example: If wallet address is exactly '0xuser', show PageUser
+  if (wallet?.address === '0xuser') {
     return <PageUser />;
   }
-  // Example: If wallet address starts with '0xsponsor', show PageSponsor
-  if (wallet?.address?.toLowerCase().startsWith('0xsponsor')) {
+  // Example: If wallet address is exactly '0xsponsor', show PageSponsor
+  if (wallet?.address === '0xsponsor') {
     return <PageSponsor />;
   }
   // Default fallback
