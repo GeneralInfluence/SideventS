@@ -96,6 +96,9 @@ function TestApp() {
         {/* Wallet Status */}
         <WalletStatus />
 
+        {/* Wallet-based page logic: show PageHost if Unicorn wallet is connected */}
+        {isUnicornConnected && <PageHost />}
+
         {/* Test Buttons */}
         <TestButtons />
 
@@ -133,8 +136,6 @@ function TestApp() {
         </div>
       </div>
 
-  {/* Wallet-based page logic: show PageHost if Unicorn wallet is connected */}
-  {isUnicornConnected && <PageHost />}
     </>
   );
 }
