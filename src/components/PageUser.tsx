@@ -1,3 +1,4 @@
+import nlp from 'compromise';
 
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
@@ -60,9 +61,41 @@ const PageUser: React.FC = () => {
 				// Step 1: Get query embedding
 				const queryEmbedding = await getOpenAiEmbedding(aiQuery, apiKey);
 				// Step 2: Vector search for top events
-				const topEvents = await searchEventsByEmbedding(queryEmbedding, 5);
-				// Step 3: Get AI answer using only top events
-				const answer = await getOpenAiEventAnswer(aiQuery, topEvents, apiKey);
+				let topEvents = await searchEventsByEmbedding(queryEmbedding, 10);
+
+						// Extract keywords from query using compromise
+						const doc = nlp(aiQuery);
+						const keywords = doc.nouns().out('array').map(k => k.toLowerCase());
+						// Always include the normalized query as a fallback keyword
+						const normalize = (str?: string) => str ? str.toLowerCase().replace(/\s+/g, ' ').trim() : '';
+						const queryNorm = normalize(aiQuery);
+						if (!keywords.includes(queryNorm) && queryNorm.length > 2) keywords.push(queryNorm);
+
+						// Keyword filter: match any keyword in any event field
+						const keywordMatches = events.filter(ev => {
+							const fields = [ev.event_name, ev.name, ev.location, ev.description, ev.type].map(normalize);
+							return keywords.some(kw => fields.some(f => f.includes(kw)));
+						});
+						// Log keyword matches for debugging
+						console.log('Normalized query:', queryNorm);
+						console.log('Keyword matches:', keywordMatches.map(ev => ({
+							id: ev.id,
+							event_name: ev.event_name,
+							name: ev.name,
+							location: ev.location,
+							description: ev.description,
+							type: ev.type
+						})));
+
+						// Merge keyword and vector results, deduplicate by id
+						const mergedEventsMap = new Map<string, EventProfile>();
+						topEvents.forEach((ev: EventProfile) => { if (ev.id) mergedEventsMap.set(ev.id, ev); });
+						keywordMatches.forEach((ev: EventProfile) => { if (ev.id) mergedEventsMap.set(ev.id, ev); });
+						const mergedEvents = Array.from(mergedEventsMap.values()).slice(0, 10);
+
+						// Improved prompt construction for OpenAI
+						// (You may want to update getOpenAiEventAnswer to include all relevant fields)
+						const answer = await getOpenAiEventAnswer(aiQuery, mergedEvents, apiKey);
 				setAiResponse(answer);
 			} catch (err: any) {
 				setAiResponse('Error: ' + (err?.message || 'Unknown error'));
