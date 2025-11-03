@@ -5,6 +5,7 @@ import { getOpenAiEventAnswer, getOpenAiEmbedding } from "../lib/openaiClient";
 import { searchEventsByEmbedding } from "../lib/supabaseClient";
 import "../styles/PageCommon.css";
 import colors from "../styles/colors";
+import SponsorCarousel from "./SponsorCarousel";
 
 type EventProfile = {
   id?: string;
@@ -154,6 +155,12 @@ const PageUser: React.FC = () => {
           {aiLoading ? "Searching..." : "Ask AI"}
         </button>
       </form>
+
+      {/* Sponsor Carousel */}
+      <div style={{ maxWidth: 900, margin: "0 auto" }}>
+        <SponsorCarousel />
+      </div>
+
       {/* AI Dialogue Area */}
       {aiResponse && (
         <div
@@ -168,6 +175,7 @@ const PageUser: React.FC = () => {
           <p>{aiResponse}</p>
         </div>
       )}
+
       {/* Events List */}
       {loading && <p>Loading events...</p>}
       {error && <p style={{ color: "red" }}>Error: {error}</p>}
