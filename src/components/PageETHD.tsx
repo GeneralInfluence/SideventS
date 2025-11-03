@@ -4,14 +4,8 @@ import { useEffect, useState } from "react";
 import { createLemonadeClient } from "../lib/lemonadeClient";
 
 
-// ETHDenver color palette
-const colors = {
-	background: '#020202', // deep black background
-	card: '#f3f2f3',       // light gray-white for contrast
-	accent: '#d44ea8',     // neon pink-magenta highlight
-	text: '#a0aeaf',       // soft metallic cyan-gray text tone
-	secondary: '#613f5c',  // dark purple secondary accent
-};
+import '../styles/PageCommon.css';
+import colors from '../styles/colors';
 
 const cardStyle: React.CSSProperties = {
 	background: colors.card,

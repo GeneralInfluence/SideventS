@@ -2,6 +2,7 @@
 // Wallet connection status display
 
 import { useUniversalWallet } from '../hooks/useUniversalWallet.js';
+import { TestButtons } from "./TestButtons";
 
 export function WalletStatus() {
   const wallet = useUniversalWallet();
@@ -49,6 +50,10 @@ export function WalletStatus() {
           </p>
         </div>
       )}
+      
+      {/* Test Buttons */}
+      <TestButtons />
     </div>
+
   );
 }

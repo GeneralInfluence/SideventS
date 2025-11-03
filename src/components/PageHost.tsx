@@ -1,7 +1,10 @@
 
 import * as React from 'react';
+import '../styles/PageCommon.css';
 import { useEffect, useState } from 'react';
 import { createLemonadeClient } from '../lib/lemonadeClient';
+import { useUniversalWallet } from '../hooks/useUniversalWallet';
+import { upsertUserProfile } from '../lib/supabaseClient';
 
 type HostEvent = {
   id: string;
@@ -23,6 +26,8 @@ const PageHost: React.FC<PageHostProps> = ({ eventShortId }) => {
   const [loading, setLoading] = useState(true);
   const [newEventName, setNewEventName] = useState('');
   const [newEventDate, setNewEventDate] = useState('');
+  // Get wallet address from universal wallet hook
+  const { address: walletAddress } = useUniversalWallet();
 
   // Step 1: Get host MongoID from event shortid
   useEffect(() => {
@@ -58,17 +63,45 @@ const PageHost: React.FC<PageHostProps> = ({ eventShortId }) => {
     })();
   }, [hostId]);
 
-  // Submission logic remains as a placeholder (not wired to backend)
-  const handleSubmit = (e: React.FormEvent) => {
+  // Submission logic: upsert user_profiles in Supabase
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Integrate with Lemonade mutation to submit new event
+    // Here, you would submit the event to Lemonade and get the lemonade_id
+    // For demonstration, we'll use eventShortId as lemonade_id
+    const lemonade_id = eventShortId;
+    // Timestamp
+    const created_at = new Date().toISOString();
+    // Upsert user profile in Supabase
+    if (!walletAddress || typeof walletAddress !== 'string') {
+      alert('Please connect your wallet before submitting an event.');
+      return;
+    }
+    try {
+      const profile = {
+        wallet_address: walletAddress,
+        lemonade_id,
+        created_at,
+      };
+      const { error } = await upsertUserProfile(profile);
+      if (error) {
+        console.error('Supabase upsert error:', error);
+        alert('Failed to save user profile.');
+      } else {
+        alert('Event submitted and user profile updated!');
+      }
+    } catch (err) {
+      console.error('Error submitting event:', err);
+      alert('Error submitting event.');
+    }
     setNewEventName('');
     setNewEventDate('');
   };
 
   return (
-    <div style={{ maxWidth: 700, margin: '40px auto', padding: '24px', background: '#f3f2f3', borderRadius: 12 }}>
-      <h2 style={{ color: '#d44ea8', fontWeight: 700, fontSize: 32 }}>Host Dashboard</h2>
+    <div>
+
+      <h2 style={{ color: '#d44ea8', fontWeight: 700, fontSize: 44, textAlign: 'center' }}>Host Dashboard</h2>
+
       <div style={{ color: '#613f5c', marginBottom: 24 }}>Host MongoID: {hostId ?? 'Loading...'}</div>
 
       <form onSubmit={handleSubmit} style={{ marginBottom: 32 }}>
