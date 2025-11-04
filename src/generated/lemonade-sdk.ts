@@ -521,6 +521,7 @@ export type Chain = {
   escrow_manager_contract: Maybe<Scalars['String']['output']>;
   fluffle_contract_address: Maybe<Scalars['String']['output']>;
   launchpad_closed_permissions_contract_address: Maybe<Scalars['String']['output']>;
+  launchpad_token_importer_contract_address: Maybe<Scalars['String']['output']>;
   launchpad_treasury_address_fee_split_manager_implementation_contract_address: Maybe<Scalars['String']['output']>;
   launchpad_treasury_staking_manager_implementation_contract_address: Maybe<Scalars['String']['output']>;
   launchpad_zap_contract_address: Maybe<Scalars['String']['output']>;
@@ -541,6 +542,7 @@ export type Chain = {
   safe_confirmations: Scalars['Float']['output'];
   stake_payment_contract: Maybe<Scalars['String']['output']>;
   tokens: Maybe<Array<Token>>;
+  zugrama_passport_contract_address: Maybe<Scalars['String']['output']>;
 };
 
 export type CheckinTokenRewardSetting = {
@@ -4910,6 +4912,17 @@ export type ParentCastInput = {
   hash: Scalars['String']['input'];
 };
 
+export type PassportMintingInfo = {
+  __typename?: 'PassportMintingInfo';
+  can_mint: Scalars['Boolean']['output'];
+  price: Scalars['String']['output'];
+  white_list_enabled: Scalars['Boolean']['output'];
+};
+
+export type PassportProvider =
+  | 'lemonade'
+  | 'zugrama';
+
 export type PaymentAccountInfo = {
   __typename?: 'PaymentAccountInfo';
   _id: Scalars['MongoID']['output'];
@@ -5206,6 +5219,7 @@ export type Query = {
   __typename?: 'Query';
   calculateTicketsPricing: PricingInfo;
   canMintLemonhead: LemonheadMintingInfo;
+  canMintPassport: PassportMintingInfo;
   canUseSpaceSlug: Scalars['Boolean']['output'];
   checkPoapDropEditCode: Scalars['Boolean']['output'];
   checkTicketTypePasscode: Scalars['Boolean']['output'];
@@ -5377,6 +5391,7 @@ export type Query = {
   listNewPaymentAccounts: Array<NewPaymentAccount>;
   listNewPayments: Array<NewPayment>;
   listOauth2Clients: Array<OAuth2Client>;
+  listPassportSponsors: ListLemonheadSponsorsResponse;
   listPoapDrops: Array<PoapDrop>;
   listRewardVaults: Array<TokenRewardVault>;
   listSpaceCategories: Array<SpaceCategory>;
@@ -5408,6 +5423,13 @@ export type QueryCalculateTicketsPricingArgs = {
 
 
 export type QueryCanMintLemonheadArgs = {
+  wallet: Scalars['String']['input'];
+};
+
+
+export type QueryCanMintPassportArgs = {
+  provider: PassportProvider;
+  sponsor: InputMaybe<Scalars['MongoID']['input']>;
   wallet: Scalars['String']['input'];
 };
 
@@ -6400,6 +6422,12 @@ export type QueryListNewPaymentsArgs = {
 
 export type QueryListOauth2ClientsArgs = {
   ids: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+
+export type QueryListPassportSponsorsArgs = {
+  provider: PassportProvider;
+  wallet: Scalars['String']['input'];
 };
 
 
@@ -9382,7 +9410,7 @@ export type GetEventByShortIdQueryVariables = Exact<{
 }>;
 
 
-export type GetEventByShortIdQuery = { __typename?: 'Query', getEvent: { __typename?: 'Event', _id: string | null, attending_count: number | null, cost: number | null, events: Array<string> | null, external_hostname: string | null, host: string, guest_limit: number | null, guests: number | null, slug: string, url: string | null, welcome_text: string | null, address: { __typename?: 'Address', latitude: number | null, longitude: number | null } | null } | null };
+export type GetEventByShortIdQuery = { __typename?: 'Query', getEvent: { __typename?: 'Event', _id: string | null, attending_count: number | null, cost: number | null, events: Array<string> | null, external_hostname: string | null, host: string, guest_limit: number | null, guests: number | null, slug: string, url: string | null, welcome_text: string | null, start: string, end: string, address: { __typename?: 'Address', latitude: number | null, longitude: number | null } | null } | null };
 
 export type GetUpcomingEventsForHostQueryVariables = Exact<{
   user: Scalars['MongoID']['input'];
@@ -9410,6 +9438,8 @@ export const GetEventByShortIdDocument = gql`
     slug
     url
     welcome_text
+    start
+    end
   }
 }
     `;

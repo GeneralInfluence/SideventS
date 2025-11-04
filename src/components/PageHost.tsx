@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 import '../styles/PageCommon.css';
 import colors from '../styles/colors';
@@ -26,7 +25,6 @@ const PageHost: React.FC<PageHostProps> = ({ eventShortId }) => {
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [newEventName, setNewEventName] = useState('');
-  const [newEventDate, setNewEventDate] = useState('');
   // Get wallet address from universal wallet hook
   const { address: walletAddress } = useUniversalWallet();
 
@@ -67,35 +65,57 @@ const PageHost: React.FC<PageHostProps> = ({ eventShortId }) => {
   // Submission logic: upsert user_profiles in Supabase
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here, you would submit the event to Lemonade and get the lemonade_id
-    // For demonstration, we'll use eventShortId as lemonade_id
-    const lemonade_id = eventShortId;
-    // Timestamp
-    const created_at = new Date().toISOString();
-    // Upsert user profile in Supabase
+    // Extract shortId from Lemonade event URL
+    const urlMatch = newEventName.match(/lemonade\.social\/e\/([\w-]+)/);
+    const lemonadeShortId = urlMatch ? urlMatch[1] : null;
+    if (!lemonadeShortId) {
+      alert('Please enter a valid Lemonade event URL.');
+      return;
+    }
+    // created_at will be set from Lemonade event's start date
     if (!walletAddress || typeof walletAddress !== 'string') {
       alert('Please connect your wallet before submitting an event.');
       return;
     }
     try {
+      // Fetch event info from Lemonade using shortId
+      const sdk = createLemonadeClient();
+      const { getEvent } = await sdk.GetEventByShortId({ shortid: lemonadeShortId });
+      if (!getEvent || !getEvent._id) {
+        alert('Could not fetch event info from Lemonade.');
+        return;
+      }
+      const eventId = getEvent._id;
+      // Upsert user profile in Supabase
       const profile = {
         wallet_address: walletAddress,
-        lemonade_id,
-        created_at,
+        lemonade_id: lemonadeShortId,
+        created_at: getEvent.start || new Date().toISOString(),
       };
       const { error } = await upsertUserProfile(profile);
       if (error) {
         console.error('Supabase upsert error:', error);
         alert('Failed to save user profile.');
+        setNewEventName('');
+        return;
+      }
+      // Upsert event profile with approved_by_ethdenver: false
+      const eventProfile = {
+        event_id: eventId,
+        approved_by_ethdenver: false,
+      };
+      const { error: eventError } = await import('../lib/supabaseClient').then(mod => mod.upsertEventProfile(eventProfile));
+      if (eventError) {
+        console.error('Supabase event profile upsert error:', eventError);
+        alert('Failed to save event profile.');
       } else {
-        alert('Event submitted and user profile updated!');
+        alert('Event submitted, user profile and event profile updated!');
       }
     } catch (err) {
       console.error('Error submitting event:', err);
       alert('Error submitting event.');
     }
     setNewEventName('');
-    setNewEventDate('');
   };
 
   return (
@@ -121,21 +141,6 @@ const PageHost: React.FC<PageHostProps> = ({ eventShortId }) => {
           placeholder="Lemonade.Social Event URL"
           value={newEventName}
           onChange={e => setNewEventName(e.target.value)}
-          style={{
-            padding: '10px 12px',
-            borderRadius: 8,
-            border: `1.5px solid ${colors.secondary}`,
-            fontSize: '1rem',
-            marginBottom: 8,
-            background: colors.card,
-            color: colors.text,
-          }}
-        />
-        <input
-          id="event-date"
-          type="date"
-          value={newEventDate}
-          onChange={e => setNewEventDate(e.target.value)}
           style={{
             padding: '10px 12px',
             borderRadius: 8,

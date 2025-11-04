@@ -15,13 +15,15 @@ query GetEventByShortId($shortid: String!) {
     slug
     url
     welcome_text
+    start
+    end
   }
 }
 query GetUpcomingEventsForHost($user: MongoID!) {
   getUpcomingEvents(user: $user, host: true) {
     _id
-    name
-    status
+    title
+    state
     start
     end
     cost
