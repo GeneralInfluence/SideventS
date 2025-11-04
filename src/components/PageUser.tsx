@@ -22,6 +22,7 @@ type EventProfile = {
 
 const PageUser: React.FC = () => {
   const [events, setEvents] = useState<EventProfile[]>([]);
+  const [displayEvents, setDisplayEvents] = useState<EventProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [aiQuery, setAiQuery] = useState("");
@@ -41,6 +42,7 @@ const PageUser: React.FC = () => {
         setError(error.message);
       } else {
         setEvents(data || []);
+        setDisplayEvents(data || []);
       }
       setLoading(false);
     };
@@ -110,6 +112,9 @@ const PageUser: React.FC = () => {
       });
       const mergedEvents = Array.from(mergedEventsMap.values()).slice(0, 10);
 
+      // Update displayed events to match search results
+      setDisplayEvents(mergedEvents);
+
       // Improved prompt construction for OpenAI
       // (You may want to update getOpenAiEventAnswer to include all relevant fields)
       const answer = await getOpenAiEventAnswer(aiQuery, mergedEvents, apiKey);
@@ -178,7 +183,7 @@ const PageUser: React.FC = () => {
       {error && <p style={{ color: "red" }}>Error: {error}</p>}
       {!loading && !error && (
         <div className="event-list">
-          {events.map((event) => (
+          {displayEvents.map((event) => (
             <div
               className="event-card"
               key={event.id}
