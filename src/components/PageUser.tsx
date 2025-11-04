@@ -11,7 +11,6 @@ type EventProfile = {
   id?: string;
   event_name?: string;
   event_id?: string;
-  name?: string;
   type?: string;
   location?: string;
   start_time?: string;
@@ -80,7 +79,6 @@ const PageUser: React.FC = () => {
       const keywordMatches = events.filter((ev) => {
         const fields = [
           ev.event_name,
-          ev.name,
           ev.location,
           ev.description,
           ev.type,
@@ -96,7 +94,6 @@ const PageUser: React.FC = () => {
         keywordMatches.map((ev) => ({
           id: ev.id,
           event_name: ev.event_name,
-          name: ev.name,
           location: ev.location,
           description: ev.description,
           type: ev.type,

@@ -199,7 +199,7 @@ const PageHost: React.FC<PageHostProps> = ({ eventShortId }) => {
                   textShadow: '0 1px 2px ' + colors.secondary,
                 }}
               >
-                {ev.name}
+                {ev.event_name}
               </strong>
               {ev.start && (
                 <div style={{ color: colors.accent }}>

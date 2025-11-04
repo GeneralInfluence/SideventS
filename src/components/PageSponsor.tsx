@@ -108,7 +108,7 @@ const PageSponsor: React.FC = () => {
 								   key={cat}
 								   style={{
 									   ...cardStyle,
-									   border: selectedCategories.includes(cat) ? `2px solid ${colors.approved}` : 'none',
+									   border: `2px solid ${selectedCategories.includes(cat) ? colors.approved : colors.secondary}`,
 									   background: selectedCategories.includes(cat) ? colors.card : colors.background,
 								   }}
 								   onClick={() => handleCategoryClick(cat)}
@@ -129,7 +129,7 @@ const PageSponsor: React.FC = () => {
 									   const eid = ev.id || ev.event_id || ev.Event;
 									   return (
 										   <div key={eid} style={eventStyle}>
-											   <strong>{ev.event_name || ev.name || ev.Event}</strong>
+											   <strong>{ev.event_name || ev.event_name || ev.Event}</strong>
 											   {ev.organizer && (
 												   <span style={{ color: colors.approved, fontWeight: 500 }}> by {ev.organizer}</span>
 											   )}
