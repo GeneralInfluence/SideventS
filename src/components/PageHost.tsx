@@ -118,7 +118,7 @@ const PageHost: React.FC<PageHostProps> = ({ eventShortId }) => {
         <input
           id="event-name"
           type="text"
-          placeholder="Event Name"
+          placeholder="Lemonade.Social Event URL"
           value={newEventName}
           onChange={e => setNewEventName(e.target.value)}
           style={{
