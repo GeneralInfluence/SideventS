@@ -1,0 +1,153 @@
+/* ETHDenver Card and Form Styles - Shared for all Page*.tsx components */
+
+.page-section {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 24px;
+}
+
+.event-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2.5rem;
+  margin-top: 2rem;
+}
+
+.event-card {
+  background: linear-gradient(120deg, #181926 0%, #23243A 100%);
+  border: 2px solid #d44ea8;
+  border-radius: 18px;
+  box-shadow: 0 6px 24px rgba(212,78,168,0.10);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+  max-height: 320px;
+  height: 320px;
+  transition: box-shadow 0.18s, transform 0.18s;
+  color: #a0aeaf;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  overflow: hidden;
+  position: relative;
+}
+.event-card:hover {
+  box-shadow: 0 12px 32px rgba(212,78,168,0.18);
+  transform: translateY(-6px) scale(1.03);
+  border-color: #F9A602;
+}
+.event-card strong {
+  font-size: 1.35rem;
+  margin-bottom: 0.4em;
+  color: #d44ea8;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 2px #23243A;
+}
+.event-card .event-type {
+  font-size: 1em;
+  font-weight: 500;
+  color: #F9A602;
+  margin-bottom: 0.2em;
+}
+.event-card .event-location {
+  font-size: 1em;
+  color: #a0aeaf;
+  margin-bottom: 0.2em;
+}
+.event-card .event-time {
+  font-size: 0.98em;
+  color: #a0aeaf;
+  margin-bottom: 0.2em;
+}
+.event-card .event-link {
+  margin-top: 0.7em;
+  color: #fff;
+  background: #d44ea8;
+  padding: 0.4em 1em;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1em;
+  box-shadow: 0 2px 8px rgba(212,78,168,0.10);
+  transition: background 0.15s, color 0.15s;
+}
+.event-card .event-link:hover {
+  background: #F9A602;
+  color: #23243A;
+}
+.event-card .event-description {
+  margin-top: 1em;
+  font-size: 1.05em;
+  color: #f3f2f3;
+  opacity: 0.98;
+  line-height: 1.5;
+  font-weight: 400;
+  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1 1 auto;
+  display: block;
+  max-height: calc(100% - 7em);
+  position: relative;
+  white-space: pre-line;
+  margin-bottom: 0.5em;
+}
+
+/* AI Search Styling */
+.ai-search-form {
+  background: linear-gradient(120deg, #181926 0%, #23243A 100%);
+  border: 2px solid #d44ea8;
+  border-radius: 18px;
+  box-shadow: 0 6px 24px rgba(212,78,168,0.10);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  margin-bottom: 2em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+.ai-search-form label {
+  color: #F9A602;
+  font-weight: 600;
+  margin-bottom: 0.5em;
+}
+.ai-search-input {
+  background: #23243A;
+  border: 1.5px solid #d44ea8;
+  border-radius: 8px;
+  color: #f3f2f3;
+  font-size: 1.05em;
+  padding: 0.7em 1em;
+  margin-bottom: 0.5em;
+  outline: none;
+  transition: border 0.15s;
+}
+.ai-search-input:focus {
+  border-color: #F9A602;
+}
+.ai-search-button {
+  background: #d44ea8;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.05em;
+  font-weight: 600;
+  padding: 0.7em 1.5em;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(212,78,168,0.10);
+  transition: background 0.15s, color 0.15s;
+}
+.ai-search-button:disabled {
+  background: #613f5c;
+  color: #a0aeaf;
+  cursor: not-allowed;
+}
+.ai-search-button:hover:not(:disabled) {
+  background: #F9A602;
+  color: #23243A;
+}
+
+@media (max-width: 900px) {
+  .event-list {
+    grid-template-columns: 1fr;
+  }
+}

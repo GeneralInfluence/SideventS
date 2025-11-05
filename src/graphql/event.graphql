@@ -1,0 +1,36 @@
+query GetEventByShortId($shortid: String!) {
+  getEvent(shortid: $shortid) {
+    _id
+    address {
+      latitude
+      longitude
+    }
+    attending_count
+    cost
+    events
+    external_hostname
+    host
+    guest_limit
+    guests
+    slug
+    url
+    welcome_text
+    start
+    end
+  }
+}
+query GetUpcomingEventsForHost($user: MongoID!) {
+  getUpcomingEvents(user: $user, host: true) {
+    _id
+    title
+    state
+    start
+    end
+    cost
+    guest_limit
+    guests
+    url
+    slug
+    welcome_text
+  }
+}
