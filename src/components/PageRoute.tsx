@@ -16,7 +16,7 @@ type WalletType = {
 function getPageForWallet(wallet: WalletType) {
   // if (wallet?.address === '0x338DE89f3BB60444BAc39D27dDd8324A2497Cb8f') {
   // return <PageUser />;
-  return <PageHost eventShortId={'SMu78xNR'} />;
+  // return <PageHost eventShortId={'SMu78xNR'} />;
   // return <PageHost walletId={'6900cb85d97bec334b6b5902'} />;
   // }
   // if (wallet?.address === '0x338DE89f3BB60444BAc39D27dDd8324A2497Cb8f') {
