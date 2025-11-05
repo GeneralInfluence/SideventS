@@ -93,7 +93,7 @@ const PageHost: React.FC<PageHostProps> = ({ eventShortId }) => {
           approved_by_ethdenver: false,
         };
       // Call backend to register event
-      const response = await fetch('/api/events/register', {
+  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/events/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

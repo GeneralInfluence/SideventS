@@ -33,7 +33,7 @@ const PageUser: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch("/api/supabase/select?table=event_profiles&columns=*");
+  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/supabase/select?table=event_profiles&columns=*`);
         const result = await response.json();
         if (result.error) {
           setError(result.error);
@@ -98,7 +98,7 @@ const PageUser: React.FC = () => {
 
       // Call backend for OpenAI chat completion
       const prompt = `You are an ETHDenver event assistant. Answer the user's question using the following event data.\n\nEvents:\n${mergedEvents.map(e => `Name: ${e.event_name}, Type: ${e.type}, Location: ${e.location}, Start: ${e.start_time}, Description: ${e.description}`).join('\n')}\n\nUser question: ${aiQuery}`;
-      const response = await fetch("/api/openai/completion", {
+  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/openai/completion`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

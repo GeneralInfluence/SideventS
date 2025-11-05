@@ -15,14 +15,14 @@ export type EventProfile = {
 
 // User Profile functions
 export async function getUserProfile(walletAddress: string) {
-  const response = await fetch(`/api/supabase/select?table=user_profiles&columns=*&wallet_address=eq.${walletAddress}`);
+  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/supabase/select?table=user_profiles&columns=*&wallet_address=eq.${walletAddress}`);
   const result = await response.json();
   if (result.error) throw new Error(result.error);
   return result.data?.[0] || null;
 }
 
 export async function upsertUserProfile(profile: UserProfile) {
-  const response = await fetch('/api/supabase/insert', {
+  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/supabase/insert`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -37,14 +37,14 @@ export async function upsertUserProfile(profile: UserProfile) {
 
 // Event Profile functions
 export async function getEventProfile(eventId: string) {
-  const response = await fetch(`/api/supabase/select?table=event_profiles&columns=*&id=eq.${eventId}`);
+  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/supabase/select?table=event_profiles&columns=*&id=eq.${eventId}`);
   const result = await response.json();
   if (result.error) throw new Error(result.error);
   return result.data?.[0] || null;
 }
 
 export async function upsertEventProfile(profile: EventProfile) {
-  const response = await fetch('/api/supabase/insert', {
+  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/supabase/insert`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
