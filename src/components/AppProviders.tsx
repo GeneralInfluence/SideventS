@@ -43,9 +43,6 @@ export default function AppProviders({ children }: { children: React.ReactNode }
             onConnect={(wallet: unknown) =>
               console.log("✅ Unicorn autoconnected!", wallet)
             }
-            onError={(error: unknown) =>
-              console.error("❌ Autoconnect failed:", error)
-            }
           />
         </RainbowKitProvider>
       </QueryClientProvider>
