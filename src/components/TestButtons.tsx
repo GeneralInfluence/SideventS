@@ -44,7 +44,11 @@ export function TestButtons() {
       });
       setLastResult(`✅ Sent! TX: ${result.transactionHash || result.hash || 'completed'}`);
     } catch (err) {
-      setLastResult(`❌ Error: ${err.message}`);
+      let errorMsg = 'Unknown error';
+      if (typeof err === 'object' && err && 'message' in err && typeof (err as { message?: string }).message === 'string') {
+        errorMsg = (err as { message: string }).message;
+      }
+      setLastResult(`❌ Error: ${errorMsg}`);
       console.error('Send ETH error:', err);
     }
   };
@@ -61,7 +65,11 @@ export function TestButtons() {
       const formatted = (Number(bal) / 1e6).toFixed(2);
       setLastResult(`✅ Balance: ${formatted} USDC`);
     } catch (err) {
-      setLastResult(`❌ Error: ${err.message}`);
+      let errorMsg = 'Unknown error';
+      if (typeof err === 'object' && err && 'message' in err && typeof (err as { message?: string }).message === 'string') {
+        errorMsg = (err as { message: string }).message;
+      }
+      setLastResult(`❌ Error: ${errorMsg}`);
       console.error('Read balance error:', err);
     }
   };
@@ -75,7 +83,11 @@ export function TestButtons() {
       setSignedMessage(message);
       setLastResult(`✅ Signed! Sig: ${sig.slice(0, 20)}...`);
     } catch (err) {
-      setLastResult(`❌ Error: ${err.message}`);
+      let errorMsg = 'Unknown error';
+      if (typeof err === 'object' && err && 'message' in err && typeof (err as { message?: string }).message === 'string') {
+        errorMsg = (err as { message: string }).message;
+      }
+      setLastResult(`❌ Error: ${errorMsg}`);
       console.error('Sign message error:', err);
     }
   };
@@ -108,7 +120,11 @@ export function TestButtons() {
         setLastResult(result ? '✅ Signature is valid!' : '❌ Signature is invalid!');
       }
     } catch (err) {
-      setLastResult(`❌ Error: ${err.message}`);
+      let errorMsg = 'Unknown error';
+      if (typeof err === 'object' && err && 'message' in err && typeof (err as { message?: string }).message === 'string') {
+        errorMsg = (err as { message: string }).message;
+      }
+      setLastResult(`❌ Error: ${errorMsg}`);
       console.error('Verify signature error:', err);
     }
   };
@@ -140,7 +156,11 @@ export function TestButtons() {
       setSignedMessage(JSON.stringify(message));
       setLastResult(`✅ Typed data signed! Sig: ${sig.slice(0, 20)}...`);
     } catch (err) {
-      setLastResult(`❌ Error: ${err.message}`);
+      let errorMsg = 'Unknown error';
+      if (typeof err === 'object' && err && 'message' in err && typeof (err as { message?: string }).message === 'string') {
+        errorMsg = (err as { message: string }).message;
+      }
+      setLastResult(`❌ Error: ${errorMsg}`);
       console.error('Sign typed data error:', err);
     }
   };
@@ -235,7 +255,7 @@ export function TestButtons() {
           <li><strong>Universal hooks work with ALL wallet types</strong> - same code for EOA and smart accounts</li>
           <li>Send ETH test sends to: <code>{TEST_ADDRESS.slice(0, 10)}...{TEST_ADDRESS.slice(-8)}</code></li>
           <li>USDC contract on Base: <code>{USDC_BASE.slice(0, 10)}...</code></li>
-          <li>Make sure you're on <strong>Base network</strong> (chain ID: 8453)</li>
+          <li>Make sure you&apos;re on <strong>Base network</strong> (chain ID: 8453)</li>
           <li>All operations use minimal amounts (0.0001 ETH)</li>
           <li>🦄 Unicorn wallets = gasless transactions</li>
           <li>🦊 Standard wallets = normal gas fees apply</li>
