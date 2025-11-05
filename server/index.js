@@ -1,21 +1,21 @@
 dotenv.config();
 
 import express from "express";
+import cors from "cors";
 import dotenv from "dotenv";
 import { supabase } from "./supabase.js";
 import { openai } from "./openai.js";
 dotenv.config();
 
+
 const app = express();
 app.use(express.json());
 
-import cors from "cors";
-
-// Allow requests from your Vercel domain
+// Allow requests from Vercel frontend
 const allowedOrigins = ["https://sidevents.vercel.app"];
 app.use(cors({
   origin: allowedOrigins,
-  credentials: true, // if you use cookies or auth headers
+  credentials: true,
 }));
 
 // Custom endpoint for event registration via Lemonade URL
