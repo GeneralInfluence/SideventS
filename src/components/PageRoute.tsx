@@ -13,25 +13,18 @@ type WalletType = {
 };
 
 function getPageForWallet(wallet: WalletType) {
-  // if (wallet?.address === '0x338DE89f3BB60444BAc39D27dDd8324A2497Cb8f') {
-  // return <PageUser />;
-  return <PageHost eventShortId={'SMu78xNR'} />;
-  // return <PageHost walletId={'6900cb85d97bec334b6b5902'} />;
-  // }
-  // if (wallet?.address === '0x338DE89f3BB60444BAc39D27dDd8324A2497Cb8f') {
-  // return <PageETHD />;
-  // }
-  // Add more conditions for other pages
-  // Example: If wallet address is exactly '0xuser', show PageUser
-  // if (wallet?.address === "0xuser") {
-  //   return <PageUser />;
-  // }
-  // Example: If wallet address is exactly '0xsponsor', show PageSponsor
-  // if (wallet?.address === "0xsponsor") {
+  if (wallet?.address === '0xe7446D343E357e650B74B0196307433aB920e0E8') {
     return <PageSponsor />;
-  // }
-  // Default fallback
-  return <div>Please connect your wallet.</div>;
+  }
+  if (wallet?.address === '0x338DE89f3BB60444BAc39D27dDd8324A2497Cb8f') {
+    return <PageHost eventShortId={'SMu78xNR'} />;
+  }
+  if (wallet?.address === '0x8Ee927f5a31EbA81b02AB1Ffc74289b32a505D35') {
+    return <PageETHD />;
+  }
+  return <PageUser />;
+  // // Default fallback
+  // return <div>Please connect your wallet.</div>;
 }
 
 const PageRoute: React.FC = () => {
