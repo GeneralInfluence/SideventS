@@ -32,14 +32,21 @@ const PageHost: React.FC<PageHostProps> = ({ eventShortId }) => {
   useEffect(() => {
     (async () => {
       try {
-  // Fetch event from Lemonade using GraphQL proxy
-  const query = `query GetEventByShortId($shortid: String!) { getEvent: getEventByShortId(shortid: $shortid) { _id host } }`;
-  const variables = { shortid: eventShortId };
-  const result = await lemonadeGraphQL(query, variables);
-  const getEvent = result?.data?.getEvent;
-  setHostId(getEvent?.host ?? null);
+        // Use correct query per Lemonade schema
+        const query = `query GetEvent($shortid: String!) { getEvent(shortid: $shortid) { _id host } }`;
+        const variables = { shortid: eventShortId };
+        const result = await lemonadeGraphQL(query, variables);
+        console.log('Lemonade getEvent result:', result);
+        if (result?.errors) {
+          console.error('Lemonade GraphQL errors:', result.errors);
+        }
+        const getEvent = result?.data?.getEvent;
+        if (!getEvent || !getEvent.host) {
+          console.warn('No host found for eventShortId:', eventShortId, 'Result:', result);
+        }
+        setHostId(getEvent?.host ?? null);
       } catch (err) {
-        console.log('Fetched event from Short ID:', null);
+        console.error('Error fetching event from Lemonade:', err);
         setHostId(null);
       }
     })();
@@ -51,13 +58,21 @@ const PageHost: React.FC<PageHostProps> = ({ eventShortId }) => {
     (async () => {
       setLoading(true);
       try {
-  // Fetch upcoming events for host using GraphQL proxy
-  const query = `query GetUpcomingEventsForHost($user: MongoID!) { getUpcomingEvents: getUpcomingEventsForHost(user: $user) { _id event_name start status } }`;
-  const variables = { user: hostId };
-  const result = await lemonadeGraphQL(query, variables);
-  const getUpcomingEvents = result?.data?.getUpcomingEvents || [];
-  setEvents(getUpcomingEvents);
+        // Use correct query per Lemonade schema
+        const query = `query GetUpcomingEvents($user: MongoID!) { getUpcomingEvents(user: $user, host: true) { _id title state start end cost guest_limit guests url slug welcome_text } }`;
+        const variables = { user: hostId };
+        const result = await lemonadeGraphQL(query, variables);
+        console.log('Lemonade getUpcomingEvents result:', result);
+        if (result?.errors) {
+          console.error('Lemonade GraphQL errors:', result.errors);
+        }
+        const getUpcomingEvents = result?.data?.getUpcomingEvents || [];
+        if (!Array.isArray(getUpcomingEvents) || getUpcomingEvents.length === 0) {
+          console.warn('No upcoming events found for hostId:', hostId, 'Result:', result);
+        }
+        setEvents(getUpcomingEvents);
       } catch (err) {
+        console.error('Error fetching upcoming events from Lemonade:', err);
         setEvents([]);
       } finally {
         setLoading(false);
