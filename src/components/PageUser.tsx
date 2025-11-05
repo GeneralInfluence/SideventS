@@ -164,14 +164,19 @@ const PageUser: React.FC = () => {
       {aiResponse && (
         <div
           style={{
-            background: "#f6f6f6",
-            padding: "1em",
-            borderRadius: "8px",
+            background: colors.accent,
+            color: colors.card,
+            padding: "1.2em",
+            borderRadius: "10px",
             marginBottom: "2em",
+            fontWeight: 700,
+            fontSize: "1.15em",
+            boxShadow: "0 2px 12px rgba(111,30,81,0.18)",
+            letterSpacing: "0.01em",
           }}
         >
-          <strong>AI Response:</strong>
-          <p>{aiResponse}</p>
+          <strong style={{ color: colors.card, fontSize: "1.2em" }}>AI Response:</strong>
+          <p style={{ marginTop: "0.7em", color: colors.card }}>{aiResponse}</p>
         </div>
       )}
 
