@@ -32,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(200).json({ embedding: data.data[0].embedding });
     }
     // Handle chat completion request
-    const prompt = `You are an ETHDenver event assistant. Answer the user's question using the following event data.\n\nEvents:\n${events && Array.isArray(events) ? events.map(e => `Name: ${e.event_name}, Type: ${e.type}, Location: ${e.location}, Start: ${e.start_time}, Description: ${e.description}`).join('\n') : ''}\n\nUser question: ${query}`;
+      const prompt = `You are an ETHDenver event assistant. Answer the user's question using the following event data.\n\nEvents:\n${events.map((e: { event_name: string; type: string; location: string; start_time: string; description: string }) => `Name: ${e.event_name}, Type: ${e.type}, Location: ${e.location}, Start: ${e.start_time}, Description: ${e.description}`).join('\n')}\n\nUser question: ${query}`;
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
