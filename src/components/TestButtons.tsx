@@ -1,7 +1,7 @@
 // src/examples/basic/src/components/TestButtons.jsx
 // Test suite component for AutoConnect functionality
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { parseEther } from 'viem';
 import {
   useUniversalWallet
@@ -26,24 +26,25 @@ const ERC20_ABI = [
   },
 ];
 
-export function TestButtons() {
+export function TestButtons(): React.JSX.Element {
   const wallet = useUniversalWallet();
   const tx = useUniversalTransaction();
   const sign = useUniversalSignMessage();
 
-  const [lastResult, setLastResult] = useState('');
-  const [signature, setSignature] = useState('');
-  const [signedMessage, setSignedMessage] = useState('');
+  const [lastResult, setLastResult] = useState<string>('');
+  const [signature, setSignature] = useState<string>('');
+  const [signedMessage, setSignedMessage] = useState<string>('');
 
-  const handleSendETH = async () => {
+  const handleSendETH = async (): Promise<void> => {
     try {
       setLastResult('Sending 0.0001 ETH...');
       const result = await tx.sendTransactionAsync({
         to: TEST_ADDRESS,
         value: parseEther('0.0001'),
       });
-      setLastResult(`✅ Sent! TX: ${result.transactionHash || result.hash || 'completed'}`);
-    } catch (err) {
+      const txResult = result as { transactionHash?: string; hash?: string };
+      setLastResult(`✅ Sent! TX: ${txResult.transactionHash || txResult.hash || 'completed'}`);
+    } catch (err: unknown) {
       let errorMsg = 'Unknown error';
       if (typeof err === 'object' && err && 'message' in err && typeof (err as { message?: string }).message === 'string') {
         errorMsg = (err as { message: string }).message;
@@ -53,18 +54,18 @@ export function TestButtons() {
     }
   };
 
-  const handleReadBalance = async () => {
+  const handleReadBalance = async (): Promise<void> => {
     try {
       setLastResult('Reading USDC balance...');
       const bal = await tx.readContractAsync({
         address: USDC_BASE,
         abi: ERC20_ABI,
         functionName: 'balanceOf',
-        args: [wallet.address],
+        args: [wallet.address ?? ''],
       });
       const formatted = (Number(bal) / 1e6).toFixed(2);
       setLastResult(`✅ Balance: ${formatted} USDC`);
-    } catch (err) {
+    } catch (err: unknown) {
       let errorMsg = 'Unknown error';
       if (typeof err === 'object' && err && 'message' in err && typeof (err as { message?: string }).message === 'string') {
         errorMsg = (err as { message: string }).message;
@@ -74,7 +75,7 @@ export function TestButtons() {
     }
   };
 
-  const handleSignMessage = async () => {
+  const handleSignMessage = async (): Promise<void> => {
     const message = 'Testing AutoConnect v1.2.0!';
     try {
       setLastResult('Signing message...');
@@ -82,7 +83,7 @@ export function TestButtons() {
       setSignature(sig);
       setSignedMessage(message);
       setLastResult(`✅ Signed! Sig: ${sig.slice(0, 20)}...`);
-    } catch (err) {
+    } catch (err: unknown) {
       let errorMsg = 'Unknown error';
       if (typeof err === 'object' && err && 'message' in err && typeof (err as { message?: string }).message === 'string') {
         errorMsg = (err as { message: string }).message;
@@ -92,7 +93,7 @@ export function TestButtons() {
     }
   };
 
-  const handleVerifySignature = async () => {
+  const handleVerifySignature = async (): Promise<void> => {
     if (!signature || !signedMessage) {
       setLastResult('❌ Sign a message first!');
       return;
@@ -103,23 +104,22 @@ export function TestButtons() {
         message: signedMessage,
         signature,
       });
-      
-      if (typeof result === 'object') {
-        if (result.isSmartAccount) {
+      if (typeof result === 'object' && result !== null) {
+        if ((result as { isSmartAccount?: boolean }).isSmartAccount) {
           setLastResult(
-            `⚠️ Smart Account Signature (${result.standard})\n` +
-            `Cannot verify client-side. ${result.message}\n` +
+            `⚠️ Smart Account Signature (${(result as { standard?: string }).standard})\n` +
+            `Cannot verify client-side. ${(result as { message?: string }).message}\n` +
             `Note: Signature IS valid on-chain via ERC-1271.`
           );
-        } else if (result.isValid) {
-          setLastResult(`✅ Signature is valid! (${result.standard} - EOA)`);
+        } else if ((result as { isValid?: boolean }).isValid) {
+          setLastResult(`✅ Signature is valid! (${(result as { standard?: string }).standard} - EOA)`);
         } else {
-          setLastResult(`❌ ${result.message}`);
+          setLastResult(`❌ ${(result as { message?: string }).message}`);
         }
       } else {
         setLastResult(result ? '✅ Signature is valid!' : '❌ Signature is invalid!');
       }
-    } catch (err) {
+    } catch (err: unknown) {
       let errorMsg = 'Unknown error';
       if (typeof err === 'object' && err && 'message' in err && typeof (err as { message?: string }).message === 'string') {
         errorMsg = (err as { message: string }).message;
@@ -129,10 +129,10 @@ export function TestButtons() {
     }
   };
 
-  const handleSignTypedData = async () => {
-    const message = {
+  const handleSignTypedData = async (): Promise<void> => {
+    const message: { name: string; wallet?: string } = {
       name: 'Test User',
-      wallet: wallet.address,
+  wallet: wallet.address ?? undefined,
     };
     try {
       setLastResult('Signing typed data...');
@@ -155,7 +155,7 @@ export function TestButtons() {
       setSignature(sig);
       setSignedMessage(JSON.stringify(message));
       setLastResult(`✅ Typed data signed! Sig: ${sig.slice(0, 20)}...`);
-    } catch (err) {
+    } catch (err: unknown) {
       let errorMsg = 'Unknown error';
       if (typeof err === 'object' && err && 'message' in err && typeof (err as { message?: string }).message === 'string') {
         errorMsg = (err as { message: string }).message;
@@ -166,7 +166,7 @@ export function TestButtons() {
   };
 
   if (!wallet.isConnected) {
-    return null;
+    return <></>;
   }
 
   return (

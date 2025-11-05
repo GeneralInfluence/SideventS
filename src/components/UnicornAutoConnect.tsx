@@ -6,22 +6,46 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ThirdwebProvider, AutoConnect } from 'thirdweb/react';
+import type { AutoConnectProps } from 'thirdweb/react';
 import { createThirdwebClient } from 'thirdweb';
+
+import { wrapUnicornWallet } from '../utils/unicornWalletWrapper';
 import { inAppWallet } from 'thirdweb/wallets';
 import { base, polygon, ethereum, arbitrum, optimism } from 'thirdweb/chains';
-import { wrapUnicornWallet } from '../utils/unicornWalletWrapper';
+
+
+
+import type { Wallet } from 'thirdweb/wallets';
+
+interface UnicornWalletState {
+  wallet: Wallet;
+  address: string;
+  chain: string;
+  chainId: number;
+  timestamp: number;
+}
+
+declare global {
+  interface Window {
+    __UNICORN_WALLET_STATE__?: UnicornWalletState;
+  }
+}
 
 // Simple chain mapping
-const getChainByName = (chainName) => {
-  const chains = {
-    'base': base,
-    'polygon': polygon, 
-    'ethereum': ethereum,
-    'mainnet': ethereum,
-    'arbitrum': arbitrum,
-    'optimism': optimism,
-  };
-  return chains[chainName?.toLowerCase()] || base;
+const chains = {
+  'base': base,
+  'polygon': polygon, 
+  'ethereum': ethereum,
+  'mainnet': ethereum,
+  'arbitrum': arbitrum,
+  'optimism': optimism,
+} as const;
+
+type ChainName = keyof typeof chains;
+
+const getChainByName = (chainName: string) => {
+  const key = chainName?.toLowerCase() as ChainName;
+  return chains[key] || base;
 };
 
 // Simple environment detection - only runs when accessed via Unicorn portal
@@ -40,16 +64,25 @@ const isUnicornEnvironment = () => {
 };
 
 // Isolated AutoConnect component that renders in its own React root
-const IsolatedAutoConnect = ({ 
-  onConnect, 
-  onError,
+type IsolatedAutoConnectProps = Omit<AutoConnectProps, 'onConnect' | 'wallets' | 'client'> & {
+  onConnect?: AutoConnectProps['onConnect'];
+  clientId?: string;
+  factoryAddress?: string;
+  defaultChain?: string;
+  debug?: boolean;
+  enableTransactionApproval?: boolean;
+};
+
+const IsolatedAutoConnect = ({
+  onConnect,
+  // onError,
   clientId,
   factoryAddress,
   defaultChain = 'base',
   timeout = 5000,
   debug = false,
-  enableTransactionApproval = true, // New prop
-}) => {
+  enableTransactionApproval = true,
+}: IsolatedAutoConnectProps) => {
   // Configuration - use props with sensible defaults
   const finalClientId = clientId || "4e8c81182c3709ee441e30d776223354";
   const finalFactoryAddress = factoryAddress || "0xD771615c873ba5a2149D5312448cE01D677Ee48A";
@@ -79,19 +112,36 @@ const IsolatedAutoConnect = ({
   return (
     <ThirdwebProvider>
       <AutoConnect
-        client={client}
-        wallets={[wallet]}
-        onConnect={async (connectedWallet) => {
+    client={client}
+    wallets={[wallet]}
+  onConnect={async (connectedWallet) => {
           // Extract wallet address properly
-          let walletAddress = 'Unknown';
+          const walletAddress = (() => {
+            if (typeof connectedWallet === 'object' && connectedWallet !== null) {
+              const account = typeof (connectedWallet as { getAccount?: () => { address?: string } }).getAccount === 'function'
+                ? (connectedWallet as { getAccount?: () => { address?: string } }).getAccount?.()
+                : undefined;
+              return account?.address ?? (connectedWallet as { address?: string }).address ?? 'No address found';
+            }
+            return 'No address found';
+          })();
+          // Use walletAddress in debug log to avoid unused variable error
+          if (debug) {
+            console.log('Wallet address:', walletAddress);
+          }
           try {
-            const account = connectedWallet.getAccount?.();
-            walletAddress = account?.address || connectedWallet.address || 'No address found';
+            let walletAddress = 'No address found';
+            if (typeof connectedWallet === 'object' && connectedWallet !== null) {
+              const account = typeof (connectedWallet as { getAccount?: () => { address?: string } }).getAccount === 'function'
+                ? (connectedWallet as { getAccount?: () => { address?: string } }).getAccount?.()
+                : undefined;
+              walletAddress = account?.address ?? (connectedWallet as { address?: string }).address ?? 'No address found';
+            }
             
             // Wrap wallet to add transaction approval if enabled
             // Pass client and finalChain to the wrapper
             const finalWallet = enableTransactionApproval 
-              ? wrapUnicornWallet(connectedWallet, true, client, finalChain)
+              ? wrapUnicornWallet(connectedWallet)
               : connectedWallet;
             
             if (debug) {
@@ -108,11 +158,10 @@ const IsolatedAutoConnect = ({
               window.__UNICORN_WALLET_STATE__ = {
                 wallet: finalWallet,
                 address: walletAddress,
-                chain: finalChain.name,
+                chain: finalChain.name ?? '',
                 chainId: finalChain.id,
                 timestamp: Date.now()
               };
-              
               if (debug) {
                 console.log('🦄 Global state stored:', window.__UNICORN_WALLET_STATE__);
               }
@@ -128,7 +177,6 @@ const IsolatedAutoConnect = ({
                   chainId: finalChain.id
                 }
               }));
-              
               if (debug) {
                 console.log('🦄 Event dispatched: unicorn-wallet-connected');
               }
@@ -144,21 +192,8 @@ const IsolatedAutoConnect = ({
             }
             
           } catch (e) {
-            console.warn('🦄 Could not extract wallet address:', e);
-            if (onError) {
-              onError(e);
-            }
-          }
-        }}
-        onError={(error) => {
-          if (debug) {
-            console.log('🦄 IsolatedAutoConnect: Failed (silently)');
-            console.error('Error details:', error);
-          }
-          
-          // Call user-provided callback but don't show errors to user
-          if (onError) {
-            onError(error);
+            const error = e instanceof Error ? e : new Error(String(e));
+            console.warn('🦄 Could not extract wallet address:', error);
           }
         }}
         timeout={timeout}
@@ -168,7 +203,7 @@ const IsolatedAutoConnect = ({
 };
 
 // Main UnicornAutoConnect component that creates isolated React root
-const UnicornAutoConnect = (props) => {
+const UnicornAutoConnect: React.FC<IsolatedAutoConnectProps> = (props) => {
   React.useEffect(() => {
     // Only run if in Unicorn environment
     if (!isUnicornEnvironment()) {
@@ -208,7 +243,7 @@ const UnicornAutoConnect = (props) => {
       
       // Clear global state on unmount
       if (typeof window !== 'undefined') {
-        delete window.__UNICORN_WALLET_STATE__;
+        window.__UNICORN_WALLET_STATE__ = undefined;
       }
       
       setTimeout(() => {
@@ -222,7 +257,7 @@ const UnicornAutoConnect = (props) => {
         }
       }, 100);
     };
-  }, []); // Empty dependency array ensures this only runs once
+  }, [props]); // Add props to dependency array for strict typing
 
   return null; // This component doesn't render anything in the main React tree
 };

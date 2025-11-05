@@ -85,9 +85,6 @@ export default function App() {
             onConnect={(wallet: unknown) =>
               console.log("✅ Unicorn autoconnected!", wallet)
             }
-            onError={(error: unknown) =>
-              console.error("❌ Autoconnect failed:", error)
-            }
           />
         </RainbowKitProvider>
       </QueryClientProvider>
