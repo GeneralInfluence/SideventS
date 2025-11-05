@@ -1,6 +1,6 @@
 import nlp from "compromise";
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { getAllEventProfiles } from "../lib/supabaseClient";
 import { getOpenAiEventAnswer, getOpenAiEmbedding } from "../lib/openaiClient";
 import { searchEventsByEmbedding } from "../lib/supabaseClient";
 import "../styles/PageCommon.css";
@@ -33,12 +33,11 @@ const PageUser: React.FC = () => {
     const fetchEvents = async () => {
       setLoading(true);
       setError(null);
-      const { data, error } = await supabase
-        .from("event_profiles")
-        .select("*")
-        .order("start_time", { ascending: true });
+      const result = await getAllEventProfiles();
+      const data = result?.data;
+      const error = result?.error;
       if (error) {
-        setError(error.message);
+        setError(error);
       } else {
         setEvents(data || []);
         setDisplayEvents(data || []);
