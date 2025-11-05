@@ -1,8 +1,8 @@
 import nlp from "compromise";
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
+// import { supabase } from "../lib/supabaseClient";
 // import { getOpenAiEventAnswer, getOpenAiEmbedding } from "../lib/openaiClient";
-import { searchEventsByEmbedding } from "../lib/supabaseClient";
+// import { searchEventsByEmbedding } from "../lib/supabaseClient";
 import "../styles/PageCommon.css";
 import colors from "../styles/colors";
 import SponsorCarousel from "./SponsorCarousel";
@@ -32,15 +32,17 @@ const PageUser: React.FC = () => {
     const fetchEvents = async () => {
       setLoading(true);
       setError(null);
-      const { data, error } = await supabase
-        .from("event_profiles")
-        .select("*")
-        .order("start_time", { ascending: true });
-      if (error) {
-        setError(error.message);
-      } else {
-        setEvents(data || []);
-        setDisplayEvents(data || []);
+      try {
+        const response = await fetch("/api/supabase/select?table=event_profiles&columns=*");
+        const result = await response.json();
+        if (result.error) {
+          setError(result.error);
+        } else {
+          setEvents(result.data || []);
+          setDisplayEvents(result.data || []);
+        }
+      } catch (err: any) {
+        setError(err?.message || "Unknown error");
       }
       setLoading(false);
     };

@@ -1,54 +1,58 @@
-export async function searchEventsByEmbedding(embedding: number[], topK: number = 5) {
-  const { data, error } = await supabase.rpc('match_event_profiles', {
-    query_embedding: embedding,
-    match_count: topK
-  });
-  if (error) throw error;
-  return data;
-}
-import { createClient } from '@supabase/supabase-js';
-
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-// User Profile functions
-export async function getUserProfile(walletAddress: string) {
-  return supabase
-    .from('user_profiles')
-    .select('*')
-    .eq('wallet_address', walletAddress)
-    .single();
-}
-
-export async function upsertUserProfile(profile: {
+// User Profile types
+export type UserProfile = {
   wallet_address: string;
   lemonade_id?: string;
   hosted_event_ids?: string[];
   submitted_event_ids?: string[];
-}) {
-  return supabase
-    .from('user_profiles')
-    .upsert([profile], { onConflict: 'wallet_address' });
+};
+
+// Event Profile types
+export type EventProfile = {
+  id: string;
+  approved_by_ethdenver?: boolean;
+  sponsorship_level?: string;
+};
+
+// User Profile functions
+export async function getUserProfile(walletAddress: string) {
+  const response = await fetch(`/api/supabase/select?table=user_profiles&columns=*&wallet_address=eq.${walletAddress}`);
+  const result = await response.json();
+  if (result.error) throw new Error(result.error);
+  return result.data?.[0] || null;
+}
+
+export async function upsertUserProfile(profile: UserProfile) {
+  const response = await fetch('/api/supabase/insert', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      table: 'user_profiles',
+      data: [profile],
+    }),
+  });
+  return response.json();
 }
 
 // Event Profile functions
 export async function getEventProfile(eventId: string) {
-  return supabase
-    .from('event_profiles')
-    .select('*')
-    .eq('id', eventId)
-    .single();
+  const response = await fetch(`/api/supabase/select?table=event_profiles&columns=*&id=eq.${eventId}`);
+  const result = await response.json();
+  if (result.error) throw new Error(result.error);
+  return result.data?.[0] || null;
 }
 
-export async function upsertEventProfile(profile: {
-  id: string;
-  approved_by_ethdenver?: boolean;
-  sponsorship_level?: string;
-}) {
-  return supabase
-    .from('event_profiles')
-    .upsert([profile], { onConflict: 'id' });
+export async function upsertEventProfile(profile: EventProfile) {
+  const response = await fetch('/api/supabase/insert', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      table: 'event_profiles',
+      data: [profile],
+    }),
+  });
+  return response.json();
 }

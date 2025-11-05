@@ -37,9 +37,9 @@ function getPageForWallet(wallet: WalletType) {
 const PageRoute: React.FC = () => {
   const wallet = useUniversalWallet();
   return (
-    <div style={{ maxWidth: 700, margin: '40px auto', padding: '24px', background: '#f3f2f3', borderRadius: 12 }}>
+    // <div style={{ maxWidth: 800, margin: '40px auto', padding: '24px', background: '#f3f2f3', borderRadius: 12 }}>
       <div>{getPageForWallet(wallet as WalletType)}</div>
-    </div>
+    // </div>
   );
 };
 
