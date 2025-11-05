@@ -1,9 +1,13 @@
 // api/supabase-proxy.ts
 import { createClient } from '@supabase/supabase-js';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !supabaseServiceRoleKey) {
+    return res.status(500).json({ error: 'Supabase environment variables not configured' });
+  }
   const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
   // Example: Insert a row into 'user_profiles'

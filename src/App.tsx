@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"; // eslint-disable-line @typescript-eslint/no-unused-vars
 import PageRoute from "./components/PageRoute";
 import { useUniversalWallet } from "./hooks/useUniversalWallet";
 // src/examples/basic/src/App.jsx
@@ -8,7 +8,7 @@ import { WagmiProvider, createConfig, http } from "wagmi";
 import { base, polygon } from "wagmi/chains";
 import { injected, walletConnect } from "wagmi/connectors";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { RainbowKitProvider, ConnectButton } from "@rainbow-me/rainbowkit";
+import { RainbowKitProvider, ConnectButton } from "@rainbow-me/rainbowkit"; // eslint-disable-line @typescript-eslint/no-unused-vars
 import "@rainbow-me/rainbowkit/styles.css";
 
 // Import from source code
@@ -42,12 +42,12 @@ const config = createConfig({
 const queryClient = new QueryClient();
 
 function TestApp() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const wallet = useUniversalWallet();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isUnicornConnected, setIsUnicornConnected] = useState(false);
 
-  useEffect(() => {
-    setIsUnicornConnected(Boolean(wallet?.isUnicorn && wallet?.unicornWallet));
-  }, [wallet?.isUnicorn, wallet?.unicornWallet]);
+  // Avoid unnecessary cascading renders: compute isUnicornConnected directly if needed
 
   return (
     <>

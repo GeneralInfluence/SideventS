@@ -1,10 +1,11 @@
 import nlp from "compromise";
 import { useEffect, useState } from "react";
 import { getAllEventProfiles } from "../lib/supabaseClient";
-import { getOpenAiEventAnswer, getOpenAiEmbedding } from "../lib/openaiClient";
+import { getOpenAiEmbedding } from "../lib/openaiClient";
 import { searchEventsByEmbedding } from "../lib/supabaseClient";
 import "../styles/PageCommon.css";
 import colors from "../styles/colors";
+import "../styles/PageCommon.css";
 import SponsorCarousel from "./SponsorCarousel";
 
 type EventProfile = {
@@ -53,9 +54,9 @@ const PageUser: React.FC = () => {
     setAiResponse(null);
     try {
       // Step 1: Get query embedding
-      const queryEmbedding = await getOpenAiEmbedding(aiQuery, ""); // Remove apiKey from client
+  const queryEmbedding = await getOpenAiEmbedding(aiQuery); // Remove apiKey from client
       // Step 2: Vector search for top events
-      let topEvents = await searchEventsByEmbedding(queryEmbedding, 10);
+  const topEvents = await searchEventsByEmbedding(queryEmbedding, 10);
 
       // Extract keywords from query using compromise
       const doc = nlp(aiQuery);
@@ -116,8 +117,12 @@ const PageUser: React.FC = () => {
       });
       const data = await response.json();
       setAiResponse(data?.choices?.[0]?.message?.content || "No response from AI");
-    } catch (err: any) {
-      setAiResponse("Error: " + (err?.message || "Unknown error"));
+  } catch (err: unknown) {
+      let errorMsg = "Unknown error";
+      if (typeof err === "object" && err && "message" in err && typeof (err as { message?: string }).message === "string") {
+        errorMsg = (err as { message: string }).message;
+      }
+      setAiResponse("Error: " + errorMsg);
     }
     setAiLoading(false);
   };

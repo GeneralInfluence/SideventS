@@ -1,8 +1,8 @@
 "use client";
 import * as React from "react";
 import { useUniversalWallet } from "../hooks/useUniversalWallet";
-import PageETHD from "./PageETHD";
-import PageHost from "./PageHost";
+import PageETHD from "./PageETHD"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import PageHost from "./PageHost"; // eslint-disable-line @typescript-eslint/no-unused-vars
 import PageUser from "./PageUser";
 import PageSponsor from "./PageSponsor";
 
@@ -13,7 +13,7 @@ type WalletType = {
   unicornWallet?: unknown;
 };
 
-function getPageForWallet(wallet: WalletType) {
+function getPageForWallet(wallet: WalletType) { // eslint-disable-line @typescript-eslint/no-unused-vars
   // if (wallet?.address === '0x338DE89f3BB60444BAc39D27dDd8324A2497Cb8f') {
   return <PageUser />;
   // return <PageHost eventShortId={'SMu78xNR'} />;
