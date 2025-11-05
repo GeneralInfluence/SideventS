@@ -72,7 +72,6 @@ const PageHost: React.FC<PageHostProps> = ({ eventShortId }) => {
       alert('Please enter a valid Lemonade event URL.');
       return;
     }
-    // created_at will be set from Lemonade event's start date
     if (!walletAddress || typeof walletAddress !== 'string') {
       alert('Please connect your wallet before submitting an event.');
       return;
@@ -85,31 +84,33 @@ const PageHost: React.FC<PageHostProps> = ({ eventShortId }) => {
         alert('Could not fetch event info from Lemonade.');
         return;
       }
-      const eventId = getEvent._id;
-      // Upsert user profile in Supabase
-      const profile = {
-        wallet_address: walletAddress,
-        lemonade_id: lemonadeShortId,
-        created_at: getEvent.start || new Date().toISOString(),
-      };
-      const { error } = await upsertUserProfile(profile);
-      if (error) {
-        console.error('Supabase upsert error:', error);
-        alert('Failed to save user profile.');
-        setNewEventName('');
-        return;
-      }
-      // Upsert event profile with approved_by_ethdenver: false
-      const eventProfile = {
-        id: eventId,
-        approved_by_ethdenver: false,
-      };
-      const { error: eventError } = await import('../lib/supabaseClient').then(mod => mod.upsertEventProfile(eventProfile));
-      if (eventError) {
-        console.error('Supabase event profile upsert error:', eventError);
-        alert('Failed to save event profile.');
+      // Prepare event data for backend
+        const eventData = {
+          event_name: typeof getEvent.slug === 'string' ? getEvent.slug : (getEvent.url || ''),
+          start_time: getEvent.start,
+          registration_url: newEventName,
+          wallet_address: walletAddress,
+          approved_by_ethdenver: false,
+        };
+      // Call backend to register event
+      const response = await fetch('/api/events/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          registration_url: newEventName,
+          event_data: eventData,
+        }),
+      });
+      const result = await response.json();
+      if (result.alreadyExists) {
+        alert('This event is already registered.');
+      } else if (result.success) {
+        alert('Event submitted and registered!');
+        // TODO: Optionally trigger embedding creation for AI search here
       } else {
-        alert('Event submitted, user profile and event profile updated!');
+        alert('Failed to register event: ' + (result.error || 'Unknown error'));
       }
     } catch (err) {
       console.error('Error submitting event:', err);
