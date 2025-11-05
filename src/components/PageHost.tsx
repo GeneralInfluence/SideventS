@@ -101,7 +101,7 @@ const PageHost: React.FC<PageHostProps> = ({ eventShortId }) => {
       }
       // Upsert event profile with approved_by_ethdenver: false
       const eventProfile = {
-        event_id: eventId,
+        id: eventId,
         approved_by_ethdenver: false,
       };
       const { error: eventError } = await import('../lib/supabaseClient').then(mod => mod.upsertEventProfile(eventProfile));

@@ -39,16 +39,16 @@ export async function getEventProfile(eventId: string) {
   return supabase
     .from('event_profiles')
     .select('*')
-    .eq('event_id', eventId)
+    .eq('id', eventId)
     .single();
 }
 
 export async function upsertEventProfile(profile: {
-  event_id: string;
+  id: string;
   approved_by_ethdenver?: boolean;
   sponsorship_level?: string;
 }) {
   return supabase
     .from('event_profiles')
-    .upsert([profile], { onConflict: 'event_id' });
+    .upsert([profile], { onConflict: 'id' });
 }

@@ -10,7 +10,6 @@
 // type EventProfile = {
 //   id?: string;
 //   event_name?: string;
-//   event_id?: string;
 //   type?: string;
 //   location?: string;
 //   start_time?: string;

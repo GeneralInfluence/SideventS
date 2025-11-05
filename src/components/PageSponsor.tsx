@@ -69,14 +69,14 @@ const PageSponsor: React.FC = () => {
 		   fetchEvents();
 	   }, []);
 				   const eventsForSelected = selectedCategories.length > 0
-					   ? Array.from(
-						   new Map(
-							   events
-								   .filter(ev => selectedCategories.some(cat => ev.categories && ev.categories.split(',').map((c: string) => c.trim()).includes(cat)))
-								   .map(ev => [ev.id || ev.event_id || ev.Event, ev])
-						   ).values()
-					   )
-					   : [];
+					 ? Array.from(
+						 new Map(
+							 events
+								 .filter(ev => selectedCategories.some(cat => ev.categories && ev.categories.split(',').map((c: string) => c.trim()).includes(cat)))
+								 .map(ev => [ev.id, ev])
+						 ).values()
+					 )
+					 : [];
 
 				   // Calculate total attendees from deduped events
 				   const totalAttendees = eventsForSelected.reduce((sum, ev) => {
@@ -125,10 +125,10 @@ const PageSponsor: React.FC = () => {
 							{eventsForSelected.length === 0 ? (
 								   <div style={{ color: colors.accent }}>No approved events in these categories.</div>
 							) : (
-								   eventsForSelected.map(ev => {
-									   const eid = ev.id || ev.event_id || ev.Event;
-									   return (
-										   <div key={eid} style={eventStyle}>
+									 eventsForSelected.map(ev => {
+										 const eid = ev.id;
+										 return (
+											 <div key={eid} style={eventStyle}>
 											   <strong>{ev.event_name || ev.event_name || ev.Event}</strong>
 											   {ev.organizer && (
 												   <span style={{ color: colors.approved, fontWeight: 500 }}> by {ev.organizer}</span>
