@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import fetch from 'node-fetch';
 
 const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_ANON_KEY);
-const openaiApiKey = process.env.VITE_OPENAI_API_KEY;
+const openaiApiKey = process.env.OPENAI_API_KEY;
 
 async function getEmbedding(text) {
 	const response = await fetch('https://api.openai.com/v1/embeddings', {
