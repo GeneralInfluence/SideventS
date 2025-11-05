@@ -28,7 +28,6 @@ const PageUser: React.FC = () => {
   const [aiQuery, setAiQuery] = useState("");
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
-  const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY as string;
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -54,13 +53,8 @@ const PageUser: React.FC = () => {
     setAiLoading(true);
     setAiResponse(null);
     try {
-      if (!apiKey) {
-        setAiResponse("Please enter your OpenAI API key.");
-        setAiLoading(false);
-        return;
-      }
       // Step 1: Get query embedding
-      const queryEmbedding = await getOpenAiEmbedding(aiQuery, apiKey);
+      const queryEmbedding = await getOpenAiEmbedding(aiQuery, ""); // Remove apiKey from client
       // Step 2: Vector search for top events
       let topEvents = await searchEventsByEmbedding(queryEmbedding, 10);
 
@@ -115,10 +109,14 @@ const PageUser: React.FC = () => {
       // Update displayed events to match search results
       setDisplayEvents(mergedEvents);
 
-      // Improved prompt construction for OpenAI
-      // (You may want to update getOpenAiEventAnswer to include all relevant fields)
-      const answer = await getOpenAiEventAnswer(aiQuery, mergedEvents, apiKey);
-      setAiResponse(answer);
+      // Call server-side OpenAI proxy
+      const response = await fetch("/api/openai-proxy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: aiQuery, events: mergedEvents })
+      });
+      const data = await response.json();
+      setAiResponse(data?.choices?.[0]?.message?.content || "No response from AI");
     } catch (err: any) {
       setAiResponse("Error: " + (err?.message || "Unknown error"));
     }

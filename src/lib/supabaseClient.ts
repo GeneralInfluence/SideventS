@@ -1,27 +1,32 @@
-export async function searchEventsByEmbedding(embedding: number[], topK: number = 5) {
-  const { data, error } = await supabase.rpc('match_event_profiles', {
-    query_embedding: embedding,
-    match_count: topK
+export async function getAllEventProfiles() {
+  const response = await fetch('/api/supabase-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'getAllEventProfiles' })
   });
-  if (error) throw error;
-  return data;
+  return await response.json();
 }
-import { createClient } from '@supabase/supabase-js';
+export async function searchEventsByEmbedding(embedding: number[], topK: number = 5) {
+  const response = await fetch('/api/supabase-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'searchEventsByEmbedding', embedding, topK })
+  });
+  const result = await response.json();
+  if (result.error) throw new Error(result.error);
+  return result.data;
+}
 
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-// User Profile functions
 export async function getUserProfile(walletAddress: string) {
-  return supabase
-    .from('user_profiles')
-    .select('*')
-    .eq('wallet_address', walletAddress)
-    .single();
+  const response = await fetch('/api/supabase-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'getUserProfile', walletAddress })
+  });
+  return await response.json();
 }
+
 
 export async function upsertUserProfile(profile: {
   wallet_address: string;
@@ -29,18 +34,12 @@ export async function upsertUserProfile(profile: {
   hosted_event_ids?: string[];
   submitted_event_ids?: string[];
 }) {
-  return supabase
-    .from('user_profiles')
-    .upsert([profile], { onConflict: 'wallet_address' });
-}
-
-// Event Profile functions
-export async function getEventProfile(eventId: string) {
-  return supabase
-    .from('event_profiles')
-    .select('*')
-    .eq('event_id', eventId)
-    .single();
+  const response = await fetch('/api/supabase-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'upsertUserProfile', profile })
+  });
+  return await response.json();
 }
 
 export async function upsertEventProfile(profile: {
@@ -48,7 +47,20 @@ export async function upsertEventProfile(profile: {
   approved_by_ethdenver?: boolean;
   sponsorship_level?: string;
 }) {
-  return supabase
-    .from('event_profiles')
-    .upsert([profile], { onConflict: 'event_id' });
+  const response = await fetch('/api/supabase-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'upsertEventProfile', profile })
+  });
+  return await response.json();
+}
+
+
+export async function getEventProfile(eventId: string) {
+  const response = await fetch('/api/supabase-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'getEventProfile', eventId })
+  });
+  return await response.json();
 }

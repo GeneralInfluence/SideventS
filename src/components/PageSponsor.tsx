@@ -1,7 +1,7 @@
 "use client";
 
 
-import { supabase } from '../lib/supabaseClient';
+import { getAllEventProfiles } from '../lib/supabaseClient';
 import { useEffect, useState } from 'react';
 import colors from '../styles/colors';
 
@@ -53,10 +53,10 @@ const PageSponsor: React.FC = () => {
 	   useEffect(() => {
 		   async function fetchEvents() {
 			   setLoading(true);
-			   // Fetch all events from Supabase (no filter)
-			   const { data, error } = await supabase
-				   .from('event_profiles')
-				   .select('*');
+			   // Fetch all events from Supabase via API proxy
+			   const result = await getAllEventProfiles();
+			   const data = result?.data;
+			   const error = result?.error;
 			   console.log('Supabase raw data:', data);
 			   if (error) {
 				   console.error('Supabase error:', error);

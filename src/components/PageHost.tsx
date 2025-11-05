@@ -2,7 +2,7 @@ import * as React from 'react';
 import '../styles/PageCommon.css';
 import colors from '../styles/colors';
 import { useEffect, useState } from 'react';
-import { createLemonadeClient } from '../lib/lemonadeClient';
+import { lemonadeGraphQL } from '../lib/lemonadeClient';
 import { useUniversalWallet } from '../hooks/useUniversalWallet';
 import { upsertUserProfile } from '../lib/supabaseClient';
 
@@ -32,11 +32,12 @@ const PageHost: React.FC<PageHostProps> = ({ eventShortId }) => {
   useEffect(() => {
     (async () => {
       try {
-        const sdk = createLemonadeClient();
-        console.log('Fetched Lemonade SDK:', sdk);
-        const { getEvent } = await sdk.GetEventByShortId({ shortid: eventShortId });
-        console.log('Fetched event from Short ID:', getEvent);
-        setHostId(getEvent?.host ?? null);
+  // Fetch event from Lemonade using GraphQL proxy
+  const query = `query GetEventByShortId($shortid: String!) { getEvent: getEventByShortId(shortid: $shortid) { _id host } }`;
+  const variables = { shortid: eventShortId };
+  const result = await lemonadeGraphQL(query, variables);
+  const getEvent = result?.data?.getEvent;
+  setHostId(getEvent?.host ?? null);
       } catch (err) {
         console.log('Fetched event from Short ID:', null);
         setHostId(null);
@@ -50,10 +51,12 @@ const PageHost: React.FC<PageHostProps> = ({ eventShortId }) => {
     (async () => {
       setLoading(true);
       try {
-        const sdk = createLemonadeClient();
-        const { getUpcomingEvents } = await sdk.GetUpcomingEventsForHost({ user: hostId });
-        console.log('Fetched upcoming events for host:', getUpcomingEvents);
-        setEvents(getUpcomingEvents);
+  // Fetch upcoming events for host using GraphQL proxy
+  const query = `query GetUpcomingEventsForHost($user: MongoID!) { getUpcomingEvents: getUpcomingEventsForHost(user: $user) { _id event_name start status } }`;
+  const variables = { user: hostId };
+  const result = await lemonadeGraphQL(query, variables);
+  const getUpcomingEvents = result?.data?.getUpcomingEvents || [];
+  setEvents(getUpcomingEvents);
       } catch (err) {
         setEvents([]);
       } finally {
@@ -79,8 +82,10 @@ const PageHost: React.FC<PageHostProps> = ({ eventShortId }) => {
     }
     try {
       // Fetch event info from Lemonade using shortId
-      const sdk = createLemonadeClient();
-      const { getEvent } = await sdk.GetEventByShortId({ shortid: lemonadeShortId });
+      const query = `query GetEventByShortId($shortid: String!) { getEvent: getEventByShortId(shortid: $shortid) { _id start } }`;
+      const variables = { shortid: lemonadeShortId };
+      const result = await lemonadeGraphQL(query, variables);
+      const getEvent = result?.data?.getEvent;
       if (!getEvent || !getEvent._id) {
         alert('Could not fetch event info from Lemonade.');
         return;
