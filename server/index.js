@@ -11,17 +11,14 @@ dotenv.config();
 const app = express();
 
 // CORS middleware FIRST, before everything else
-// Read allowed origins from environment variable
-const allowedOriginsEnv = process.env.VITE_ALLOWED_ORIGINS || "";
-const allowedOrigins = allowedOriginsEnv.split(",").map(origin => origin.trim()).filter(Boolean);
 app.use(cors({
-  origin: allowedOrigins,
+  origin: "*",
   credentials: true,
 }));
 
 // Explicitly handle OPTIONS requests for all routes
 app.options("*", cors({
-  origin: allowedOrigins,
+  origin: "*",
   credentials: true,
 }));
 
