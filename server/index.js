@@ -11,15 +11,14 @@ dotenv.config();
 const app = express();
 
 // CORS middleware FIRST, before everything else
-const allowedOrigins = ["https://sidevents.vercel.app"];
 app.use(cors({
-  origin: allowedOrigins,
+  origin: "*",
   credentials: true,
 }));
 
 // Explicitly handle OPTIONS requests for all routes
 app.options("*", cors({
-  origin: allowedOrigins,
+  origin: "*",
   credentials: true,
 }));
 
