@@ -1,3 +1,14 @@
+// Global error handlers for diagnostics
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection:', reason);
+});
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+// Health check route
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
 dotenv.config();
 
 
