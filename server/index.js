@@ -9,10 +9,9 @@ dotenv.config();
 // Log required environment variables for debugging
 console.log("[ENV] PORT:", process.env.PORT);
 console.log("[ENV] ALLOWED_ORIGINS:", process.env.ALLOWED_ORIGINS);
-console.log("[ENV] VITE_SUPABASE_URL:", process.env.VITE_SUPABASE_URL);
-console.log("[ENV] VITE_SUPABASE_ANON_KEY:", process.env.VITE_SUPABASE_ANON_KEY);
-console.log("[ENV] VITE_LEMONADE_GRAPHQL_ENDPOINT:", process.env.VITE_LEMONADE_GRAPHQL_ENDPOINT);
-console.log("[ENV] VITE_LEMONADE_AUTH_TOKEN:", process.env.VITE_LEMONADE_AUTH_TOKEN);
+console.log("[ENV] SUPABASE_URL:", process.env.SUPABASE_URL);
+console.log("[ENV] SUPABASE_ANON_KEY:", process.env.SUPABASE_ANON_KEY);
+console.log("[ENV] VITE_LEMONADE_GRAPHQL_ENDPOINT:", process.env.LEMONADE_GRAPHQL_ENDPOINT);
 console.log("[ENV] OPENAI_API_KEY:", process.env.OPENAI_API_KEY);
 
 const app = express();
