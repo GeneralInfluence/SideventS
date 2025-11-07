@@ -1,3 +1,13 @@
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import { supabase } from "./supabase.js";
+import { openai } from "./openai.js";
+
+dotenv.config();
+
+const app = express();
+
 // Global error handlers for diagnostics
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection:', reason);
@@ -9,27 +19,35 @@ process.on('uncaughtException', (err) => {
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
-dotenv.config();
 
 
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-import { supabase } from "./supabase.js";
-import { openai } from "./openai.js";
-dotenv.config();
-
-const app = express();
+// Parse allowed origins from environment variable
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : [];
 
 // CORS middleware FIRST, before everything else
 app.use(cors({
-  origin: "*",
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
   credentials: true,
 }));
 
 // Explicitly handle OPTIONS requests for all routes
 app.options("*", cors({
-  origin: "*",
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
   credentials: true,
 }));
 
@@ -142,9 +160,16 @@ app.post("/api/openai/completion", async (req, res) => {
   }
 });
 
+
+// 404 handler for unmatched routes
+app.use((req, res, next) => {
+  res.status(404).json({ error: 'Not found' });
+});
+
+// Global error handler (must be last)
 app.use((err, req, res, next) => {
   console.error('Global error handler:', err);
-  res.status(500).json({ error: 'Internal server error' });
+  res.status(500).json({ error: err.message || 'Internal server error' });
 });
 
 const PORT = process.env.PORT || 3001;
