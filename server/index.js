@@ -11,7 +11,6 @@ console.log("[ENV] PORT:", process.env.PORT);
 console.log("[ENV] ALLOWED_ORIGINS:", process.env.ALLOWED_ORIGINS);
 console.log("[ENV] SUPABASE_URL:", process.env.SUPABASE_URL);
 console.log("[ENV] SUPABASE_ANON_KEY:", process.env.SUPABASE_ANON_KEY);
-console.log("[ENV] VITE_LEMONADE_GRAPHQL_ENDPOINT:", process.env.LEMONADE_GRAPHQL_ENDPOINT);
 console.log("[ENV] OPENAI_API_KEY:", process.env.OPENAI_API_KEY);
 
 const app = express();
@@ -69,11 +68,13 @@ app.use(express.json());
 // Custom endpoint for event registration via Lemonade URL
 app.post("/api/events/register", async (req, res) => {
   try {
+    console.log("[POST /api/events/register] body:", req.body);
     const { registration_url, event_data } = req.body;
     // Extract short code from registration_url
     const match = registration_url.match(/lemonade\.social\/e\/([\w-]+)/);
     const shortCode = match ? match[1] : null;
     if (!shortCode) {
+      console.warn("[POST /api/events/register] Invalid Lemonade event URL:", registration_url);
       return res.status(400).json({ error: "Invalid Lemonade event URL." });
     }
     // Check if event with this short code already exists
@@ -81,8 +82,12 @@ app.post("/api/events/register", async (req, res) => {
       .from("event_profiles")
       .select("id, registration_url")
       .eq("registration_url", registration_url);
-    if (selectError) return res.status(500).json({ error: selectError.message });
+    if (selectError) {
+      console.error("[POST /api/events/register] Supabase select error:", selectError);
+      return res.status(500).json({ error: selectError.message });
+    }
     if (existingEvents && existingEvents.length > 0) {
+      console.log("[POST /api/events/register] Event already exists:", existingEvents[0]);
       return res.status(200).json({ alreadyExists: true, id: existingEvents[0].id });
     }
     // Get max id
@@ -91,15 +96,22 @@ app.post("/api/events/register", async (req, res) => {
       .select("id")
       .order("id", { ascending: false })
       .limit(1);
-    if (maxIdError) return res.status(500).json({ error: maxIdError.message });
+    if (maxIdError) {
+      console.error("[POST /api/events/register] Supabase max id error:", maxIdError);
+      return res.status(500).json({ error: maxIdError.message });
+    }
     const maxId = maxIdData && maxIdData.length > 0 ? parseInt(maxIdData[0].id, 10) : 0;
     const newId = maxId + 1;
     // Insert new event
     const insertData = { ...event_data, id: newId, registration_url };
+    console.log("[POST /api/events/register] Inserting event:", insertData);
     const { error: insertError } = await supabase
       .from("event_profiles")
       .insert([insertData]);
-    if (insertError) return res.status(400).json({ error: insertError.message });
+    if (insertError) {
+      console.error("[POST /api/events/register] Supabase insert error:", insertError);
+      return res.status(400).json({ error: insertError.message });
+    }
 
     // Automatically create embedding for AI search
     try {
@@ -109,12 +121,14 @@ app.post("/api/events/register", async (req, res) => {
         .map(([key, value]) => value.trim());
       const embeddingText = embeddingFields.join('. ');
       if (embeddingText.length > 0) {
+        console.log("[POST /api/events/register] Creating embedding for:", embeddingText);
         const embeddingResponse = await openai.embeddings.create({
           model: 'text-embedding-ada-002',
           input: embeddingText,
         });
         const embedding = embeddingResponse.data[0]?.embedding;
         if (embedding) {
+          console.log("[POST /api/events/register] Embedding created, updating event id:", newId);
           await supabase
             .from("event_profiles")
             .update({ embedding })
@@ -122,10 +136,11 @@ app.post("/api/events/register", async (req, res) => {
         }
       }
     } catch (embedErr) {
-      console.error('Embedding creation error:', embedErr);
+      console.error('[POST /api/events/register] Embedding creation error:', embedErr);
     }
     res.json({ success: true, id: newId });
   } catch (err) {
+    console.error('[POST /api/events/register] Handler error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -133,11 +148,16 @@ app.post("/api/events/register", async (req, res) => {
 // Example Supabase write endpoint
 app.post("/api/supabase/insert", async (req, res) => {
   try {
+    console.log("[POST /api/supabase/insert] body:", req.body);
     const { table, data } = req.body;
     const { error } = await supabase.from(table).insert(data);
-    if (error) return res.status(400).json({ error: error.message });
+    if (error) {
+      console.error("[POST /api/supabase/insert] Supabase insert error:", error);
+      return res.status(400).json({ error: error.message });
+    }
     res.json({ success: true });
   } catch (err) {
+    console.error('[POST /api/supabase/insert] Handler error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -145,11 +165,16 @@ app.post("/api/supabase/insert", async (req, res) => {
 // Example Supabase read endpoint
 app.get("/api/supabase/select", async (req, res) => {
   try {
+    console.log("[GET /api/supabase/select] query:", req.query);
     const { table, columns = "*" } = req.query;
     const { data, error } = await supabase.from(table).select(columns);
-    if (error) return res.status(400).json({ error: error.message });
+    if (error) {
+      console.error("[GET /api/supabase/select] Supabase select error:", error);
+      return res.status(400).json({ error: error.message });
+    }
     res.json({ data });
   } catch (err) {
+    console.error('[GET /api/supabase/select] Handler error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -157,6 +182,7 @@ app.get("/api/supabase/select", async (req, res) => {
 // Example OpenAI completion endpoint
 app.post("/api/openai/completion", async (req, res) => {
   try {
+    console.log("[POST /api/openai/completion] body:", req.body);
     const { prompt, model = "gpt-3.5-turbo" } = req.body;
     const completion = await openai.chat.completions.create({
       model,
@@ -164,6 +190,7 @@ app.post("/api/openai/completion", async (req, res) => {
     });
     res.json(completion);
   } catch (err) {
+    console.error('[POST /api/openai/completion] Handler error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -176,11 +203,11 @@ app.use((req, res, next) => {
 
 // Global error handler (must be last)
 app.use((err, req, res, next) => {
-  console.error('Global error handler:', err);
+  console.error('[GLOBAL ERROR HANDLER]', err);
   res.status(500).json({ error: err.message || 'Internal server error' });
 });
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`Express API server running on port ${PORT}`);
+  console.log(`[STARTUP] Express API server running on port ${PORT}`);
 });
