@@ -24,7 +24,8 @@ process.on('uncaughtException', (err) => {
 });
 // Health check route
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+  console.log('[HEALTH CHECK] /health route called');
+  res.status(200).json({ status: 'ok' });
 });
 
 
@@ -210,4 +211,7 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`[STARTUP] Express API server running on port ${PORT}`);
+  setInterval(() => {
+    console.log('[ALIVE] Server is still running');
+  }, 30000);
 });
