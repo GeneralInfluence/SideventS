@@ -22,6 +22,9 @@ process.on('unhandledRejection', (reason, promise) => {
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err);
 });
+process.on('exit', (code) => {
+  console.error(`[PROCESS EXIT] Node process exiting with code: ${code}`);
+});
 // Health check route
 app.get('/health', (req, res) => {
   console.log('[HEALTH CHECK] /health route called');
