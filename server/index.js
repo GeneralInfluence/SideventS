@@ -14,24 +14,23 @@ console.log("[ENV] SUPABASE_ANON_KEY:", process.env.SUPABASE_ANON_KEY);
 console.log("[ENV] OPENAI_API_KEY:", process.env.OPENAI_API_KEY);
 
 const app = express();
-// Dynamic CORS preflight and headers middleware
-app.use((req, res, next) => {
-  const allowedOrigins = process.env.ALLOWED_ORIGINS
-    ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
-    : [];
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin) || !origin) {
-    res.header("Access-Control-Allow-Origin", origin || "*");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    if (req.method === "OPTIONS") {
-      return res.sendStatus(200);
+// Dynamic CORS middleware using official package
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : [];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
     }
-    next();
-  } else {
-    return res.status(403).json({ error: "Not allowed by CORS" });
-  }
-});
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+  methods: "GET,POST,PUT,DELETE,OPTIONS",
+  allowedHeaders: "Content-Type,Authorization"
+}));
 
 // Global error handlers for diagnostics
 process.on('unhandledRejection', (reason, promise) => {
@@ -51,9 +50,6 @@ app.get('/health', (req, res) => {
 
 
 // Parse allowed origins from environment variable
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
-  : [];
 
 // CORS middleware FIRST, before everything else
 app.use(cors({
