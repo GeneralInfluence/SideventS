@@ -14,6 +14,16 @@ console.log("[ENV] SUPABASE_ANON_KEY:", process.env.SUPABASE_ANON_KEY);
 console.log("[ENV] OPENAI_API_KEY:", process.env.OPENAI_API_KEY);
 
 const app = express();
+// CORS preflight and headers middleware
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://sidevents.vercel.app");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // Global error handlers for diagnostics
 process.on('unhandledRejection', (reason, promise) => {
