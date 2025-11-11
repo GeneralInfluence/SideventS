@@ -16,7 +16,7 @@ console.log("[ENV] OPENAI_API_KEY:", process.env.OPENAI_API_KEY);
 const app = express();
 // Dynamic CORS middleware using official package (must be first)
 const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim().replace(/\/$/, ''))
   : [];
 // Debug logging for CORS origin matching
 app.use((req, res, next) => {

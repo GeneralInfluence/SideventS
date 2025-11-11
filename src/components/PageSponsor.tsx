@@ -57,7 +57,7 @@ const PageSponsor: React.FC = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          "/api/supabase/select?table=event_profiles&columns=*"
+          `${import.meta.env.VITE_API_BASE_URL}/supabase/select?table=event_profiles&columns=*`
         );
         const result = await response.json();
         console.log("Supabase raw data:", result.data);
