@@ -18,6 +18,14 @@ const app = express();
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
   : [];
+// Debug logging for CORS origin matching
+app.use((req, res, next) => {
+  if (req.headers.origin) {
+    console.log(`[CORS DEBUG] Incoming Origin: ${req.headers.origin}`);
+    console.log(`[CORS DEBUG] Allowed Origins:`, allowedOrigins);
+  }
+  next();
+});
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
